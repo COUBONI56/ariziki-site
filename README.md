@@ -6,7 +6,8 @@ FR · EN · DE — Astro 7 · GSAP · Lenis.
 ```bash
 npm install
 npm run dev      # http://localhost:4321  (FR) · /en/ · /de/
-npm run build    # génère dist/ à publier
+npm run build    # génère dist/
+npm run publish  # met ariziki.com à jour (via la branche production)
 ```
 
 - Instructions pour Claude Code / Antigravity : `CLAUDE.md`

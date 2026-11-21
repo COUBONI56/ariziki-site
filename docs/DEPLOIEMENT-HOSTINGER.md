@@ -2,16 +2,20 @@
 
 État : le site **ariziki.com** est créé sur l'hébergement Business Hostinger (via le connecteur Hostinger de Claude).
 
-## Publier une nouvelle version (méthode actuelle)
-1. `npm run build`, puis compresser **le contenu** du dossier `dist/` (pas le dossier lui-même) en `ariziki-site-hostinger.zip`.
-2. hPanel → Sites → ariziki.com → **Gestionnaire de fichiers** → `public_html` → **Téléverser** le zip.
-3. Demander à Claude (connecteur Hostinger) : « Déploie l'archive `ariziki-site-hostinger.zip` sur ariziki.com »
-   → opération `hosting_websites_deploy-static-site-archive` (remplace le contenu du site).
+## Publier une nouvelle version (automatique)
+Le site est relié au dépôt GitHub `COUBONI56/ariziki-site` (déploiement Git automatique Hostinger) :
+- branche **`main`** : le code source (c'est ici qu'on modifie le site) ;
+- branche **`production`** : le site construit (contenu de `dist/`). **Chaque envoi sur cette branche met ariziki.com à jour.**
 
-## Option recommandée ensuite : déploiement automatique depuis GitHub
-1. Créer un dépôt GitHub (ex. `ariziki-site`) et connecter GitHub dans hPanel (section Git).
-2. Claude pousse le code ; le connecteur publie la branche de production (`hosting_deploy`, type `static`).
-3. Chaque modification poussée est ensuite publiée automatiquement.
+Pour publier une modification : `npm run publish` (construit le site puis envoie `dist/` sur `production`).
+Ou demander simplement à Claude : « publie la modification sur ariziki.com ».
+
+⚠️ Ne jamais déployer la branche `main` dans hPanel : elle contient le code source, pas le site.
+
+## Méthode de secours (sans GitHub)
+1. `npm run build`, compresser **le contenu** de `dist/` en zip.
+2. hPanel → Sites → ariziki.com → Gestionnaire de fichiers → `public_html` → Téléverser.
+3. Connecteur Hostinger : opération `hosting_websites_deploy-static-site-archive`.
 
 ## Ce que fait le `.htaccess` fourni
 - HTTPS obligatoire, redirection `www` → domaine nu, anciennes URL `.html` → URL propres.
