@@ -1,0 +1,68 @@
+---
+import SectionHead from './SectionHead.astro';
+import { home } from '../content/home';
+import { route } from '../i18n/routes';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const o = home[lang].offers;
+const contact = route(lang, 'contact');
+---
+
+<section class="offers section theme-cream" id="offres" data-nav-theme="light" aria-labelledby="offers-title">
+  <div class="container">
+    <SectionHead eyebrow={o.eyebrow} title={o.title} lead={o.lead} id="offers-title" />
+    <ul class="offers__grid" data-cards>
+      {o.plans.map((plan, i) => (
+        <li class:list={['plan', { 'plan--featured': plan.featured }]} data-card>
+          {plan.featured && <span class="plan__badge">{o.badge}</span>}
+          <span class="plan__n">0{i + 1}</span>
+          <h3 class="plan__name">{plan.name}</h3>
+          <p class="plan__audience">{plan.audience}</p>
+          <p class="plan__price">{plan.from && <small>{plan.from}</small>}<span>{plan.price}</span></p>
+          <a class:list={['btn', 'plan__cta', { 'btn--dark': !plan.featured }]} href={`${contact}?subject=${plan.name.toLowerCase()}`}>
+            <span class="btn__label">{plan.cta}</span>
+            <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          </a>
+          <ul class="plan__list">
+            {plan.features.map((f) => <li><span aria-hidden="true">✓</span>{f}</li>)}
+          </ul>
+        </li>
+      ))}
+    </ul>
+    <div class="offers__maint" data-reveal>
+      <div>
+        <p class="offers__maint-title">{o.maintenance.title}</p>
+        <p class="muted">{o.maintenance.text}</p>
+      </div>
+      <p class="offers__maint-price">{o.maintenance.price}</p>
+    </div>
+    <p class="offers__note" data-reveal>{o.note}</p>
+  </div>
+</section>
+
+<style>
+  .offers__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .plan { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 32px; border-radius: var(--r-container); background: var(--color-paper); border: 1px solid var(--color-fog-border); }
+  .plan--featured { background: var(--color-obsidian); color: var(--color-paper); border-color: rgb(var(--color-accent-rgb) / 0.6); box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.45); }
+  .plan__badge { position: absolute; top: -13px; left: 32px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--color-accent); color: var(--color-obsidian); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .plan__n { font-size: var(--fs-caption); color: var(--color-graphite); font-variant-numeric: tabular-nums; }
+  .plan--featured .plan__n, .plan--featured .plan__audience, .plan--featured .plan__price small { color: var(--color-stone); }
+  .plan__name { font-size: var(--fs-sub); font-weight: 500; letter-spacing: -0.01em; margin-top: 8px; }
+  .plan__audience { color: var(--color-graphite); min-height: 3em; }
+  .plan__price { margin: 14px 0 8px; display: flex; align-items: baseline; gap: 8px; }
+  .plan__price span { font-size: clamp(2.5rem, 1.6rem + 2.6vw, 3.5rem); font-weight: 300; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .plan__price small { font-size: var(--fs-body-sm); color: var(--color-graphite); }
+  .plan__cta { justify-content: space-between; margin: 8px 0 24px; }
+  .plan__list { display: grid; gap: 10px; padding-top: 20px; border-top: 1px solid var(--color-fog-border); }
+  .plan--featured .plan__list { border-top-color: var(--color-steel-border); }
+  .plan__list li { display: flex; gap: 10px; font-size: var(--fs-body-sm); line-height: 1.5; }
+  .plan__list span { color: var(--color-obsidian); font-weight: 700; }
+  .plan--featured .plan__list span { color: var(--color-accent); }
+  .offers__maint { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px 32px; border-radius: var(--r-container); border: 1px dashed #d7d5d2; }
+  .offers__maint-title { font-size: 1.25rem; font-weight: 500; margin-bottom: 4px; }
+  .offers__maint-price { font-size: var(--fs-sub); font-weight: 300; white-space: nowrap; }
+  .offers__note { margin-top: 24px; font-size: var(--fs-caption); color: var(--color-graphite); }
+  @media (max-width: 1000px) { .offers__grid { grid-template-columns: 1fr; max-width: 30rem; } .plan__audience { min-height: 0; } }
+  @media (max-width: 600px) { .offers__maint { flex-direction: column; align-items: flex-start; } }
+</style>

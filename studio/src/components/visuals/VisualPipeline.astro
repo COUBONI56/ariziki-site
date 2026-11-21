@@ -1,0 +1,70 @@
+---
+/**
+ * Illustration CSS de Cibleflow : une piste qualifiée (score + signaux)
+ * au-dessus d'un mini pipeline. Valeurs purement illustratives.
+ */
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = {
+  fr: { lead: 'Piste qualifiée', role: 'Directrice commerciale', company: 'PME · Services B2B', score: 'Score', signals: ['Recrute des commerciaux', 'Nouveau marché'], channel: 'Message prêt · LinkedIn', cols: ['Identifiés', 'Contactés', 'En discussion', 'Signés'], note: 'Aperçu illustratif' },
+  en: { lead: 'Qualified lead', role: 'Head of Sales', company: 'SME · B2B services', score: 'Score', signals: ['Hiring sales reps', 'New market'], channel: 'Message ready · LinkedIn', cols: ['Identified', 'Contacted', 'In talks', 'Signed'], note: 'Illustrative preview' },
+  de: { lead: 'Qualifizierter Lead', role: 'Vertriebsleiterin', company: 'KMU · B2B-Dienste', score: 'Score', signals: ['Stellt Vertrieb ein', 'Neuer Markt'], channel: 'Nachricht bereit · LinkedIn', cols: ['Identifiziert', 'Kontaktiert', 'Im Gespräch', 'Unterzeichnet'], note: 'Illustrative Vorschau' },
+}[lang];
+const bars = [100, 62, 38, 22];
+---
+
+<div class="vp" aria-hidden="true">
+  <div class="vp__lead" data-fan="1">
+    <div class="vp__top">
+      <span class="vp__label">{t.lead}</span>
+      <span class="vp__score"><span>{t.score}</span><strong>87</strong></span>
+    </div>
+    <div class="vp__person">
+      <span class="vp__avatar"></span>
+      <span class="vp__who"><strong>{t.role}</strong><small>{t.company}</small></span>
+    </div>
+    <div class="vp__signals">{t.signals.map((s) => <span><i></i>{s}</span>)}</div>
+    <div class="vp__msg"><span class="vp__check">✓</span>{t.channel}</div>
+  </div>
+  <div class="vp__pipe" data-fan="2">
+    {t.cols.map((c, i) => (
+      <div class="vp__col">
+        <span class="vp__bar"><span style={`--h:${bars[i]}%`}></span></span>
+        <span class="vp__col-label">{c}</span>
+      </div>
+    ))}
+  </div>
+  <span class="vp__note">{t.note}</span>
+</div>
+
+<style>
+  .vp { position: relative; width: 100%; height: 100%; display: grid; place-items: center; align-content: center; gap: 14px; }
+  .vp__lead, .vp__pipe {
+    width: min(330px, 84%); border-radius: var(--r-card); color: var(--color-paper);
+    background: linear-gradient(180deg, #1b1a17 0%, #121214 100%); border: 1px solid var(--color-steel-border);
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.7);
+  }
+  .vp__lead { padding: 18px 20px; display: grid; gap: 14px; border-color: rgb(var(--color-accent-rgb) / 0.35); position: relative; z-index: 2; }
+  .vp__top { display: flex; justify-content: space-between; align-items: center; }
+  .vp__label { font-size: 10px; font-weight: 700; letter-spacing: 0.125em; text-transform: uppercase; color: var(--color-stone); }
+  .vp__score { display: inline-flex; align-items: baseline; gap: 6px; font-size: 11px; color: var(--color-stone); }
+  .vp__score strong { font-size: 1.5rem; font-weight: 300; color: var(--color-accent-light); font-variant-numeric: tabular-nums; }
+  .vp__person { display: flex; align-items: center; gap: 12px; }
+  .vp__avatar { width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4a4537, #22201b); border: 1px solid #3a372f; flex: none; }
+  .vp__who { display: grid; gap: 2px; font-size: 13px; }
+  .vp__who strong { font-weight: 500; }
+  .vp__who small { color: var(--color-stone); font-size: 12px; }
+  .vp__signals { display: flex; flex-wrap: wrap; gap: 6px; }
+  .vp__signals span { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 9px; border-radius: 99px; background: #23221e; color: #d8d6d0; }
+  .vp__signals i { width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); }
+  .vp__msg { display: flex; align-items: center; gap: 10px; font-size: 12.5px; padding: 9px 12px; border-radius: 8px; background: #1d1c1a; border: 1px solid #2a2925; color: #d8d6d0; }
+  .vp__check { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--color-accent); color: #0b0b0c; font-size: 11px; font-weight: 700; }
+  .vp__pipe { padding: 16px 18px 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; opacity: 0.85; }
+  .vp__col { display: grid; gap: 8px; justify-items: center; }
+  .vp__bar { width: 100%; height: 56px; display: flex; align-items: flex-end; border-radius: 4px; background: #1a1a1d; overflow: hidden; }
+  .vp__bar span { display: block; width: 100%; height: var(--h); background: #34343a; }
+  .vp__col:last-child .vp__bar span { background: var(--color-accent); }
+  .vp__col-label { font-size: 9.5px; color: var(--color-stone); text-align: center; line-height: 1.2; }
+  .vp__note { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #6f6e73; }
+</style>

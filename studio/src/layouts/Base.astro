@@ -1,0 +1,129 @@
+---
+import '@fontsource-variable/hanken-grotesk/wght.css';
+import '@fontsource-variable/cinzel/wght.css';
+import fontLatin from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Intro from '../components/Intro.astro';
+import { site } from '../config/site';
+import { locales, localeMeta, homePath, defaultLocale, type Locale } from '../i18n';
+import { ui } from '../i18n/ui';
+
+interface Props {
+  lang: Locale;
+  title?: string;
+  description?: string;
+  intro?: boolean;
+  /** chemins équivalents dans les autres langues (pour hreflang + sélecteur) */
+  alternates?: Partial<Record<Locale, string>>;
+}
+
+const { lang, intro = false } = Astro.props;
+const t = ui[lang];
+const title = Astro.props.title ?? t.seo.title;
+const description = Astro.props.description ?? t.seo.description;
+const alternates: Record<Locale, string> = Object.fromEntries(
+  locales.map((l) => [l, Astro.props.alternates?.[l] ?? homePath(l)]),
+) as Record<Locale, string>;
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL(site.ogImage, site.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      legalName: site.legalName,
+      url: site.url,
+      email: site.contact.email,
+      logo: `${site.url}/favicon.svg`,
+      description: ui.fr.seo.description,
+      areaServed: ['Europe', 'Afrique'],
+      sameAs: site.socials.map((s) => s.href),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      inLanguage: locales.map((l) => localeMeta[l].hreflang),
+      publisher: { '@id': `${site.url}/#organization` },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={localeMeta[lang].hreflang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={localeMeta[l].hreflang} href={new URL(alternates[l], site.url).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocale], site.url).href} />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={localeMeta[lang].og} />
+    {locales.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={localeMeta[l].og} />)}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Active les états initiaux d'animation uniquement si le JS tourne
+         et que l'utilisateur n'a pas demandé à réduire les animations.
+         Filet de sécurité : tout s'affiche après 4 s si le JS échoue. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('js-motion');
+        var seen = null, nav = null;
+        try {
+          seen = sessionStorage.getItem('az-intro');
+          nav = sessionStorage.getItem('az-nav');
+          sessionStorage.removeItem('az-nav');
+        } catch (e) {}
+        if (nav) d.classList.add('js-curtain');
+        else if (!seen) d.classList.add('js-intro');
+        setTimeout(function () {
+          if (!d.classList.contains('motion-ready')) d.classList.remove('js-motion', 'js-intro', 'js-curtain');
+        }, 4000);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.a11y.skip}</a>
+    {intro && <Intro />}
+    <div class="curtain" data-curtain aria-hidden="true"><span class="curtain__word">{site.wordmark}</span></div>
+    <Nav lang={lang} alternates={alternates} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

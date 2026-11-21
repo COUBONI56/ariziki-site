@@ -1,0 +1,47 @@
+---
+/** Illustration « en préparation » : orbites autour d'un noyau. */
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const label = { fr: 'Bientôt', en: 'Soon', de: 'Bald' }[lang];
+---
+
+<div class="vorb" aria-hidden="true">
+  <svg viewBox="0 0 400 400" class="vorb__svg">
+    <defs>
+      <radialGradient id="vorb-core" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff3d6" stop-opacity="0.95" />
+        <stop offset="35%" stop-color="#d4af37" stop-opacity="0.55" />
+        <stop offset="100%" stop-color="#090b12" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <circle cx="200" cy="200" r="70" fill="url(#vorb-core)" class="vorb__core" />
+    <circle cx="200" cy="200" r="34" fill="#05060a" stroke="rgb(255 240 205 / 0.6)" stroke-width="1" />
+    <g fill="none" stroke="#2e2e2e" stroke-width="1">
+      <circle cx="200" cy="200" r="96" />
+      <circle cx="200" cy="200" r="138" stroke-dasharray="2 6" />
+      <circle cx="200" cy="200" r="182" />
+    </g>
+    <g class="vorb__ring vorb__ring--1"><circle cx="296" cy="200" r="4" fill="#fff3d6" /></g>
+    <g class="vorb__ring vorb__ring--2"><circle cx="200" cy="62" r="5" fill="#d4af37" /></g>
+    <g class="vorb__ring vorb__ring--3"><circle cx="18" cy="200" r="3" fill="#8e8d92" /></g>
+  </svg>
+  <span class="vorb__label">{label}</span>
+</div>
+
+<style>
+  .vorb { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .vorb__svg { width: min(400px, 90%); height: auto; overflow: visible; }
+  .vorb__ring { transform-origin: 200px 200px; animation: orbit linear infinite; }
+  .vorb__ring--1 { animation-duration: 14s; }
+  .vorb__ring--2 { animation-duration: 26s; animation-direction: reverse; }
+  .vorb__ring--3 { animation-duration: 40s; }
+  .vorb__core { transform-origin: 200px 200px; animation: breathe 5s ease-in-out infinite; }
+  @keyframes orbit { to { transform: rotate(360deg); } }
+  @keyframes breathe { 50% { transform: scale(1.12); opacity: 0.8; } }
+  .vorb__label {
+    position: absolute; left: 50%; bottom: 8%; translate: -50% 0;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.125em; text-transform: uppercase;
+    color: var(--color-stone); padding: 6px 12px; border: 1px dashed var(--color-steel-border); border-radius: 99px;
+  }
+</style>

@@ -1,0 +1,171 @@
+---
+/**
+ * Formulaire de contact : fonctionne avec ou sans JavaScript.
+ * Envoi vers /api/contact.php (généré depuis src/pages/api/contact.php.ts,
+ * exécuté par le PHP d'Hostinger). Anti-spam : champ piège + délai minimum.
+ */
+import { contact } from '../content/contact';
+import { route } from '../i18n/routes';
+import { site } from '../config/site';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const f = contact[lang].form;
+---
+
+<form class="cform" action="/api/contact.php" method="post" novalidate data-contact-form
+  data-msg-required={f.required} data-msg-email={f.invalidEmail} data-msg-short={f.tooShort}
+  data-msg-sending={f.sending} data-msg-submit={f.submit}>
+  <input type="hidden" name="lang" value={lang} />
+  <input type="hidden" name="t" value="" data-form-time />
+  <div class="cform__trap" aria-hidden="true">
+    <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <div class="cform__row">
+    <div class="cfield">
+      <label for="cf-name">{f.name}</label>
+      <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="120" />
+      <p class="cfield__error" aria-live="polite"></p>
+    </div>
+    <div class="cfield">
+      <label for="cf-email">{f.email}</label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" required maxlength="160" />
+      <p class="cfield__error" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="cfield">
+    <label for="cf-subject">{f.subject}</label>
+    <div class="cfield__select">
+      <select id="cf-subject" name="subject" data-subject>
+        {f.subjects.map((s) => <option value={s.value}>{s.label}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="cfield">
+    <label for="cf-message">{f.message}</label>
+    <textarea id="cf-message" name="message" rows="6" required minlength="10" maxlength="5000" placeholder={f.messagePlaceholder}></textarea>
+    <p class="cfield__error" aria-live="polite"></p>
+  </div>
+
+  <div class="cfield cfield--check">
+    <label class="ccheck">
+      <input type="checkbox" name="consent" value="1" required />
+      <span>{f.consent} <a href={route(lang, 'privacy')}>{f.privacy}</a></span>
+    </label>
+    <p class="cfield__error" aria-live="polite"></p>
+  </div>
+
+  <div class="cform__actions">
+    <button class="btn btn--dark cform__submit" type="submit" data-submit>
+      <span class="btn__label">{f.submit}</span>
+      <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+  </div>
+
+  <div class="cform__status" role="status" aria-live="polite" data-status>
+    <div class="cform__ok" hidden data-ok>
+      <p class="cform__ok-title">{f.success.title}</p>
+      <p>{f.success.text}</p>
+    </div>
+    <p class="cform__err" hidden data-err>{f.error} <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (form) {
+    const q = <T extends Element>(s: string) => form.querySelector<T>(s)!;
+    const time = q<HTMLInputElement>('[data-form-time]');
+    time.value = String(Date.now());
+    const ok = q<HTMLElement>('[data-ok]');
+    const err = q<HTMLElement>('[data-err]');
+    const submit = q<HTMLButtonElement>('[data-submit]');
+    const label = submit.querySelector('.btn__label')!;
+    const d = form.dataset;
+
+    // Sujet prérempli : /contact/?subject=novarys
+    const params = new URLSearchParams(location.search);
+    const subject = params.get('subject');
+    const select = q<HTMLSelectElement>('[data-subject]');
+    if (subject && [...select.options].some((o) => o.value === subject)) select.value = subject;
+    // Retour sans JavaScript : ?status=ok|error
+    if (params.get('status') === 'ok') ok.hidden = false;
+    if (params.get('status') === 'error') err.hidden = false;
+
+    const setError = (el: HTMLInputElement | HTMLTextAreaElement, msg: string) => {
+      const box = el.closest('.cfield')!.querySelector('.cfield__error')!;
+      box.textContent = msg;
+      el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    };
+    const validate = () => {
+      let first: HTMLElement | null = null;
+      const fields = form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required]');
+      fields.forEach((el) => {
+        let msg = '';
+        if (el.type === 'checkbox') msg = (el as HTMLInputElement).checked ? '' : d.msgRequired!;
+        else if (!el.value.trim()) msg = d.msgRequired!;
+        else if (el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim())) msg = d.msgEmail!;
+        else if (el.tagName === 'TEXTAREA' && el.value.trim().length < 10) msg = d.msgShort!;
+        setError(el, msg);
+        if (msg && !first) first = el;
+      });
+      if (first) (first as HTMLElement).focus();
+      return !first;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      ok.hidden = true; err.hidden = true;
+      if (!validate()) return;
+      submit.disabled = true; label.textContent = d.msgSending!;
+      const data = new FormData(form);
+      data.set('js', '1');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        const json = await res.json();
+        if (json && json.ok) { form.reset(); time.value = String(Date.now()); ok.hidden = false; }
+        else err.hidden = false;
+      } catch {
+        err.hidden = false;
+      } finally {
+        submit.disabled = false; label.textContent = d.msgSubmit!;
+      }
+    });
+  }
+</script>
+
+<style>
+  .cform { display: grid; gap: 22px; }
+  .cform__trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .cform__row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .cfield { display: grid; gap: 8px; }
+  .cfield label { font-size: var(--fs-label); font-weight: 700; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--color-graphite); }
+  .cfield input:not([type='checkbox']), .cfield textarea, .cfield select {
+    width: 100%; font: inherit; font-size: var(--fs-body); color: var(--color-obsidian);
+    background: transparent; border: 0; border-bottom: 1px solid #d7d5d2; border-radius: 0;
+    padding: 12px 0; transition: border-color var(--dur-fast);
+    -webkit-appearance: none; appearance: none;
+  }
+  .cfield textarea { resize: vertical; min-height: 140px; line-height: 1.6; }
+  .cfield input:focus, .cfield textarea:focus, .cfield select:focus { outline: none; border-bottom-color: var(--color-obsidian); box-shadow: 0 1px 0 0 var(--color-obsidian); }
+  .cfield input:focus-visible, .cfield textarea:focus-visible, .cfield select:focus-visible { outline: none; }
+  .cfield [aria-invalid='true'] { border-bottom-color: #b42318; }
+  .cfield__select { position: relative; }
+  .cfield__select::after { content: ''; position: absolute; right: 4px; top: 50%; width: 8px; height: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+  .cfield select { cursor: pointer; padding-right: 28px; }
+  .cfield__error { min-height: 1em; font-size: var(--fs-caption); color: #b42318; }
+  .cfield__error:empty { min-height: 0; }
+  .ccheck { display: flex; gap: 12px; align-items: flex-start; font-size: var(--fs-body-sm) !important; font-weight: 400 !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--color-graphite) !important; line-height: 1.5; cursor: pointer; }
+  .ccheck input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--color-obsidian); flex: none; }
+  .ccheck a { color: var(--color-obsidian); text-decoration: underline; text-underline-offset: 3px; }
+  .cform__actions { margin-top: 6px; }
+  .cform__submit[disabled] { opacity: 0.6; cursor: progress; }
+  .cform__ok { padding: 20px 24px; border-radius: var(--r-card); background: var(--color-obsidian); color: var(--color-paper); border-left: 3px solid var(--color-accent); }
+  .cform__ok-title { font-size: 1.25rem; font-weight: 500; margin-bottom: 4px; }
+  .cform__err { padding: 16px 20px; border-radius: var(--r-card); background: #fdf1f0; color: #7a1a12; }
+  .cform__err a { text-decoration: underline; }
+  @media (max-width: 640px) { .cform__row { grid-template-columns: 1fr; } }
+</style>

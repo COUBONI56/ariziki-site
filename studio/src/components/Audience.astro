@@ -1,0 +1,33 @@
+---
+import SectionHead from './SectionHead.astro';
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const a = home[lang].audience;
+---
+
+<section class="aud section theme-dark" id="pour-qui" data-nav-theme="dark" aria-labelledby="aud-title">
+  <div class="container">
+    <SectionHead eyebrow={a.eyebrow} title={a.title} id="aud-title" />
+    <ul class="aud__grid" data-cards>
+      {a.items.map((it, i) => (
+        <li class="aud__card" data-card>
+          <span class="aud__n">0{i + 1}</span>
+          <h3 class="aud__title">{it.title}</h3>
+          <p class="muted">{it.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .aud__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .aud__card { display: grid; align-content: start; gap: 12px; min-height: 260px; padding: 28px; border-radius: var(--r-card); background: #111112; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06); transition: transform 500ms var(--ease-out), background-color 500ms var(--ease-out); }
+  .aud__card:hover { transform: translateY(-4px); background: #161617; }
+  .aud__n { font-size: var(--fs-caption); color: var(--color-accent-light); margin-bottom: auto; padding-bottom: 48px; font-variant-numeric: tabular-nums; }
+  .aud__title { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; line-height: 1.25; }
+  @media (max-width: 1100px) { .aud__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .aud__grid { grid-template-columns: 1fr; } .aud__card { min-height: 0; } .aud__n { padding-bottom: 20px; } }
+</style>

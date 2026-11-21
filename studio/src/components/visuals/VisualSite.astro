@@ -1,0 +1,41 @@
+---
+/** Mini-aperçu d'ariziki.com dans une fenêtre de navigateur (CSS pur) + scores Lighthouse mesurés. */
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const scores = [['99', 'Performance'], ['100', 'Accessibilité'], ['100', 'Bonnes pratiques'], ['100', 'SEO']];
+---
+
+<div class="vs" aria-hidden="true">
+  <div class="vs__window" data-fan="1">
+    <div class="vs__chrome"><i></i><i></i><i></i><span class="vs__url">ariziki.com</span></div>
+    <div class="vs__page">
+      <div class="vs__nav"><span></span><span class="vs__logo">ARIZIKI</span><span class="vs__pill"></span></div>
+      <div class="vs__title">Une marque.<br />Plusieurs logiciels.<br />Une seule exigence.</div>
+      <div class="vs__horizon"><span class="vs__glow"></span><span class="vs__sphere"></span></div>
+    </div>
+  </div>
+  <div class="vs__scores" data-fan="2">
+    {scores.map(([v, l]) => <div class="vs__score"><span class="vs__ring">{v}</span><small>{l}</small></div>)}
+  </div>
+</div>
+
+<style>
+  .vs { width: 100%; height: 100%; display: grid; place-items: center; align-content: center; gap: 14px; }
+  .vs__window { width: min(460px, 94%); border-radius: var(--r-card); overflow: hidden; background: #090b12; border: 1px solid var(--color-steel-border); box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8); position: relative; z-index: 2; }
+  .vs__chrome { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #111216; border-bottom: 1px solid var(--color-steel-border); }
+  .vs__chrome i { width: 8px; height: 8px; border-radius: 50%; background: #2a2b30; }
+  .vs__url { margin-left: 10px; padding: 3px 10px; border-radius: 99px; background: #1b1c21; font-size: 10.5px; color: var(--color-stone); }
+  .vs__page { position: relative; height: 230px; overflow: hidden; padding: 12px 16px; }
+  .vs__nav { display: flex; justify-content: space-between; align-items: center; }
+  .vs__nav span:first-child { width: 60px; height: 5px; border-radius: 3px; background: #2a2b30; }
+  .vs__logo { font-family: var(--font-brand); font-size: 8px; letter-spacing: 0.2em; color: var(--color-accent); border: 1px solid rgb(var(--color-accent-rgb) / 0.6); padding: 3px 5px; border-radius: 3px; }
+  .vs__pill { width: 44px; height: 14px; border-radius: 99px; background: #fff; }
+  .vs__title { margin-top: 22px; font-size: 21px; font-weight: 300; line-height: 1.02; letter-spacing: -0.02em; color: #fff; }
+  .vs__horizon { position: absolute; left: 50%; top: 150px; width: 640px; aspect-ratio: 1; translate: -50% 0; }
+  .vs__glow { position: absolute; left: 50%; top: 0; width: 92%; height: 46%; translate: -50% -50%; background: var(--glow-hero); opacity: 0.85; mix-blend-mode: screen; }
+  .vs__sphere { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(120% 60% at 50% 0%, #17130b 0%, #070608 22%, #020203 60%); box-shadow: inset 0 1px 0 var(--rim-light), 0 -2px 24px -4px rgb(var(--color-accent-rgb) / 0.45); }
+  .vs__scores { width: min(460px, 94%); display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .vs__score { display: grid; justify-items: center; gap: 6px; padding: 12px 6px; border-radius: 10px; background: #141416; border: 1px solid var(--color-steel-border); }
+  .vs__ring { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 500; color: var(--color-accent-light); border: 2px solid var(--color-accent); font-variant-numeric: tabular-nums; }
+  .vs__score small { font-size: 9.5px; color: var(--color-stone); text-align: center; line-height: 1.2; }
+</style>

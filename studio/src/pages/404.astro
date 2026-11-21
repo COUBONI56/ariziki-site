@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { route } from '../i18n/routes';
+---
+
+<Base lang="fr" title="Page introuvable — ARIZIKI Smartness" description="Cette page n'existe pas ou a été déplacée.">
+  <PageHero eyebrow="404" title={['Page introuvable.']} lead="Cette page n'existe pas ou a été déplacée.">
+    <Fragment slot="actions">
+      <a class="btn" href={route('fr', 'home')}><span class="btn__label">Retour à l'accueil</span></a>
+      <a class="link-ghost" href={route('fr', 'contact')}>Demander un devis →</a>
+    </Fragment>
+  </PageHero>
+</Base>

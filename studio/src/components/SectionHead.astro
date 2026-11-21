@@ -1,0 +1,19 @@
+---
+/** En-tête de section : sur-titre + grand titre (lignes masquées) + chapeau optionnel. */
+interface Props { eyebrow: string; title: string[]; lead?: string; align?: 'start' | 'center'; id?: string; size?: 'h-lg' | 'h' }
+const { eyebrow, title, lead, align = 'start', id, size = 'h-lg' } = Astro.props;
+---
+
+<header class:list={['shead', `shead--${align}`]}>
+  <p class="eyebrow" data-reveal>{eyebrow}</p>
+  <h2 class={size} id={id} data-split>
+    {title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+  </h2>
+  {lead && <p class="lead" data-reveal>{lead}</p>}
+</header>
+
+<style>
+  .shead { display: grid; gap: 22px; justify-items: start; margin-bottom: clamp(40px, 6vw, 80px); max-width: 52rem; }
+  .shead--center { justify-items: center; text-align: center; margin-inline: auto; }
+  .shead .lead { max-width: 36rem; }
+</style>
