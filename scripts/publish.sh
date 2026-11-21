@@ -13,4 +13,4 @@ git add -A
 if git diff --cached --quiet; then echo "Rien à publier : le site en ligne est déjà à jour."; exit 0; fi
 git -c user.name="ARIZIKI" -c user.email="contacts@ariziki.com" commit -q -m "Publication $(date '+%Y-%m-%d %H:%M')"
 git push -q origin production
-echo "✓ Publié : ariziki.com sera à jour dans une minute."
+echo "✓ Publié : ariziki.com sera à jour dans une à deux minutes (sinon : hPanel → Git → Déployer, branche production)."

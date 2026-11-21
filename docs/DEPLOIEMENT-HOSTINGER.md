@@ -12,6 +12,14 @@ Ou demander simplement à Claude : « publie la modification sur ariziki.com ».
 
 ⚠️ Ne jamais déployer la branche `main` dans hPanel : elle contient le code source, pas le site.
 
+**Si le site n'est pas à jour 2 minutes après la publication** (le déclenchement automatique de Hostinger
+ne part pas toujours) : hPanel → Sites → ariziki.com → Avancé → Git → bouton « Déployer » sur la branche
+`production`. Ou demander à Claude : « relance le déploiement de ariziki.com » (opération `hosting_deploy`,
+dépôt `COUBONI56/ariziki-site`, branche `production`, type `static`).
+
+Même principe pour **arizikismartness.com** (studio ARIZIKI Smartness) : source dans `studio/`,
+publication avec `cd studio && npm run publish`, branche **`studio-production`**.
+
 ## Méthode de secours (sans GitHub)
 1. `npm run build`, compresser **le contenu** de `dist/` en zip.
 2. hPanel → Sites → ariziki.com → Gestionnaire de fichiers → `public_html` → Téléverser.
