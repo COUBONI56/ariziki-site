@@ -8,7 +8,7 @@
 import type { Locale } from '../i18n';
 
 type Link = { label: string; href: string };
-type Plan = { name: string; price: string; from?: string; audience: string; features: string[]; cta: string; featured?: boolean };
+type Plan = { name: string; price: string; from?: string; audience: string; delay: string; features: string[]; cta: string; featured?: boolean };
 
 export type HomeContent = {
   hero: { eyebrow: string; title: string[]; lead: string; primary: Link; secondary: Link; scrollLabel: string; soonChip: string; chips?: string[] };
@@ -84,24 +84,27 @@ export const home: Record<Locale, HomeContent> = {
         {
           name: 'Essentiel', from: 'dès', price: '1 490 €',
           audience: 'Pour lancer une présence premium rapidement.',
+          delay: 'Environ 7 jours ouvrés',
           features: ['1 page premium (one-page)', 'Direction artistique sur mesure', 'Animations à l’entrée et au défilement', 'Mobile, tablette et ordinateur', 'Formulaire de contact', 'Mise en ligne sur votre domaine'],
           cta: 'Choisir Essentiel',
         },
         {
           name: 'Signature', from: 'dès', price: '3 900 €', featured: true,
           audience: 'Pour les entreprises qui veulent convertir.',
+          delay: '2 à 3 semaines',
           features: ['Jusqu’à 6 pages', '2 langues', 'Animations sur mesure (GSAP)', 'Pages services ou produits', 'Référencement technique et données structurées', 'Formulaire relié à votre messagerie'],
           cta: 'Choisir Signature',
         },
         {
           name: 'Prestige', from: 'dès', price: '8 900 €',
           audience: 'Pour les marques qui visent l’excellence.',
+          delay: '4 à 6 semaines',
           features: ['Site complet multilingue', 'Direction artistique dédiée', 'Transitions de pages immersives', 'Toutes les pages nécessaires', 'Publication automatique (GitHub)', 'Accompagnement 30 jours après la mise en ligne'],
           cta: 'Choisir Prestige',
         },
       ],
       maintenance: { title: 'Maintenance', price: '49 € / mois', text: 'Hébergement géré, sauvegardes, mises à jour et petites modifications.' },
-      note: 'Prix indicatifs. Micro-entreprise : TVA non applicable, art. 293 B du CGI. Tarifs adaptés pour l’Afrique francophone : sur devis.',
+      note: 'Délais indicatifs, comptés à partir de la validation du brief et de la réception de vos contenus (textes, logo, images) ; le calendrier exact figure dans le devis. Micro-entreprise : TVA non applicable, art. 293 B du CGI. Tarifs adaptés pour l’Afrique francophone : sur devis.',
     },
 
     method: {
@@ -120,7 +123,7 @@ export const home: Record<Locale, HomeContent> = {
       eyebrow: 'Questions fréquentes',
       title: ['Vous vous demandez', 'peut-être…'],
       items: [
-        { q: 'Combien de temps faut-il pour créer mon site ?', a: 'Cela dépend de la formule et de la rapidité des validations. Nous vous donnons un calendrier précis avec le devis, et la page d’accueil vous est présentée en premier.' },
+        { q: 'Combien de temps faut-il pour créer mon site ?', a: 'Comptez environ 7 jours ouvrés pour Essentiel, 2 à 3 semaines pour Signature et 4 à 6 semaines pour Prestige, à partir de la validation du brief et de la réception de vos contenus. Le calendrier exact dépend de vos choix et figure dans le devis. La page d’accueil vous est toujours présentée en premier.' },
         { q: 'Pourrai-je modifier mon site ensuite ?', a: 'Oui. Vous pouvez nous demander des modifications à tout moment, avec la formule de maintenance ou à la demande. Le code vous appartient.' },
         { q: 'Qui s’occupe de l’hébergement et du nom de domaine ?', a: 'Nous pouvons tout gérer pour vous, ou publier le site sur votre propre hébergement. Le nom de domaine reste toujours à votre nom.' },
         { q: 'Mon site sera-t-il bien référencé sur Google ?', a: 'Chaque site est construit pour le référencement : pages rapides, balises optimisées, plan du site et données structurées. Le positionnement dépend ensuite de votre contenu et de votre concurrence.' },
