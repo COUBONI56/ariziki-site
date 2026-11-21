@@ -1,0 +1,82 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../config/site';
+import { ui, linkHref } from '../i18n/ui';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = ui[lang];
+const year = new Date().getFullYear();
+const letters = site.name.split('');
+---
+
+<footer class="footer theme-dark" data-nav-theme="dark">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <Logo size="lg" />
+        <p class="muted footer__pitch">{t.footer.pitch[0]}<br />{t.footer.pitch[1]}</p>
+        <a class="link-ghost footer__mail" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+      </div>
+      <nav class="footer__cols" aria-label={t.a11y.footerNav}>
+        {t.footer.columns.map((col) => (
+          <div class="footer__col">
+            <p class="footer__heading">{col.title}</p>
+            <ul>
+              {col.links.map((l) => <li><a class="footer__link" href={linkHref(lang, l)}>{l.label}</a></li>)}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
+
+    <div class="footer__word" aria-hidden="true" data-footer-word>
+      {letters.map((l) => <span class="footer__mask"><span class="footer__letter">{l}</span></span>)}
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} {site.legalName}. {t.footer.rights}</p>
+      {site.socials.length > 0 && (
+        <ul class="footer__socials">
+          {site.socials.map((s) => <li><a class="footer__link" href={s.href} target="_blank" rel="noopener">{s.label}</a></li>)}
+        </ul>
+      )}
+      <a class="footer__top-link" href="#main">{t.footer.toTop} ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding-top: clamp(72px, 9vw, 128px); overflow: clip; }
+  .footer__top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 48px; padding-bottom: 56px; border-bottom: 1px solid var(--color-steel-border); }
+  .footer__brand { display: grid; gap: 22px; justify-items: start; align-content: start; }
+  .footer__pitch { font-size: var(--fs-body-lg); }
+  .footer__mail { color: var(--color-paper); }
+  .footer__cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .footer__heading { font-size: var(--fs-label); font-weight: 700; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--color-stone); margin-bottom: 18px; }
+  .footer__col ul { display: grid; gap: 10px; }
+  .footer__link { font-size: var(--fs-body-sm); color: var(--color-stone); transition: color var(--dur-fast); }
+  .footer__link:hover { color: var(--color-paper); }
+
+  .footer__word {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-brand); font-weight: 500;
+    font-size: clamp(3.5rem, 15.5vw, 15rem); line-height: 0.82;
+    padding-top: clamp(40px, 6vw, 80px);
+    user-select: none;
+  }
+  .footer__mask { display: inline-block; overflow: clip; padding-bottom: 0.04em; }
+  .footer__letter {
+    display: inline-block;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.55) 70%, rgb(var(--color-accent-rgb) / 0.6) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 28px; font-size: var(--fs-caption); color: var(--color-stone); border-top: 1px solid var(--color-steel-border); margin-top: clamp(24px, 3vw, 40px); }
+  .footer__socials { display: flex; gap: 20px; }
+  .footer__top-link { color: var(--color-stone); transition: color var(--dur-fast); }
+  .footer__top-link:hover { color: var(--color-paper); }
+
+  @media (max-width: 900px) { .footer__top { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .footer__cols { grid-template-columns: 1fr 1fr; } }
+</style>

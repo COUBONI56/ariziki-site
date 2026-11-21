@@ -1,0 +1,62 @@
+---
+import { home } from '../content/home';
+import { site } from '../config/site';
+import Horizon from './Horizon.astro';
+import { route } from '../i18n/routes';
+import type { Locale } from '../i18n';
+interface Props {
+  lang: Locale;
+  /** Remplacements optionnels (pages produits, etc.) */
+  eyebrow?: string; title?: string[]; lead?: string; button?: string; href?: string; external?: boolean;
+}
+const { lang } = Astro.props;
+const base = home[lang].cta;
+const c = {
+  eyebrow: Astro.props.eyebrow ?? base.eyebrow,
+  title: Astro.props.title ?? base.title,
+  lead: Astro.props.lead ?? base.lead,
+  button: Astro.props.button ?? base.button,
+  href: Astro.props.href ?? route(lang, 'contact'),
+};
+const ext = Astro.props.external ? { target: '_blank', rel: 'noopener' } : {};
+---
+
+<section class="cta theme-paper" id="contact-cta" data-nav-theme="dark" aria-labelledby="cta-title">
+  <div class="cta__panel theme-dark" data-cta-panel>
+    <Horizon class="cta__horizon" data-cta-horizon />
+    <div class="cta__content container">
+      <p class="eyebrow" data-reveal>{c.eyebrow}</p>
+      <h2 class="display cta__title" id="cta-title" data-split>
+        {c.title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+      </h2>
+      <p class="lead cta__lead" data-reveal>{c.lead}</p>
+      <div class="cta__actions" data-reveal>
+        <a class="btn" href={c.href} data-magnetic {...ext}>
+          <span class="btn__label">{c.button}</span>
+          <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </a>
+        <a class="link-ghost cta__mail" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { padding: 0; }
+  .cta__panel {
+    position: relative; overflow: clip; isolation: isolate;
+    min-height: 100vh; min-height: 100svh;
+    display: grid; align-items: center;
+    background: var(--color-night);
+    will-change: clip-path;
+  }
+  .cta__panel::after { content: ''; position: absolute; inset: auto 0 0 0; height: 28%; z-index: -1; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
+  .cta :global(.cta__horizon) { top: 82%; width: max(140vw, 1400px); z-index: -1; }
+  .cta__content { display: grid; justify-items: center; text-align: center; gap: 28px; padding-block: calc(var(--nav-h) + 40px) 24vh; }
+  .cta__title { max-width: 16ch; font-size: min(var(--fs-display), 13vh); }
+  .cta__lead { max-width: 34rem; }
+  .cta__actions { display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; margin-top: 8px; }
+  .cta__mail { color: var(--color-stone); }
+  .cta__mail:hover { color: var(--color-paper); }
+  @media (max-width: 900px) { .cta :global(.cta__horizon) { top: 86%; width: max(240vw, 1000px); } }
+</style>

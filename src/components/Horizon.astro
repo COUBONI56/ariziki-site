@@ -1,0 +1,31 @@
+---
+/**
+ * L'« horizon » : une sphère sombre bordée d'or devant un halo radial.
+ * Signature visuelle de la marque, utilisée dans le hero et le CTA final.
+ */
+interface Props { class?: string; [key: `data-${string}`]: unknown }
+const { class: className = '', ...attrs } = Astro.props;
+---
+
+<div class:list={['horizon', className]} aria-hidden="true" {...attrs}>
+  <div class="horizon__glow" data-glow></div>
+  <div class="horizon__sphere"></div>
+</div>
+
+<style>
+  .horizon { position: absolute; left: 50%; aspect-ratio: 1; translate: -50% 0; will-change: transform; }
+  .horizon__glow {
+    position: absolute; left: 50%; top: 0; width: 92%; height: 46%;
+    translate: -50% -50%;
+    background: var(--glow-hero);
+    opacity: 0.8; mix-blend-mode: screen;
+  }
+  .horizon__sphere {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(120% 60% at 50% 0%, #17130b 0%, #070608 22%, #020203 60%);
+    box-shadow:
+      inset 0 1.5px 0 var(--rim-light),
+      inset 0 18px 60px -18px rgb(var(--color-accent-rgb) / 0.5),
+      0 -2px 50px -6px rgb(var(--color-accent-rgb) / 0.4);
+  }
+</style>

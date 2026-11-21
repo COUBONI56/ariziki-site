@@ -1,0 +1,39 @@
+---
+/**
+ * Animation d'entrée (1re visite de la session uniquement).
+ * Masquée par défaut : affichée seulement si <html> a la classe js-intro.
+ */
+import { site } from '../config/site';
+const letters = site.name.split('');
+---
+
+<div class="intro" aria-hidden="true" data-intro>
+  <div class="intro__inner">
+    <div class="intro__word">
+      {letters.map((l) => <span class="intro__mask"><span class="intro__letter">{l}</span></span>)}
+    </div>
+    <div class="intro__line"><span></span></div>
+  </div>
+</div>
+
+<style>
+  .intro {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: var(--color-night); color: var(--color-paper);
+    place-items: center;
+  }
+  :global(html.js-intro) .intro { display: grid; }
+  .intro__inner { display: grid; justify-items: center; gap: 22px; }
+  .intro__word {
+    display: flex; font-family: var(--font-brand); font-weight: 500;
+    font-size: clamp(2.25rem, 6.5vw, 5rem); letter-spacing: 0.2em; padding-left: 0.2em; line-height: 1;
+  }
+  .intro__letter {
+    background: linear-gradient(180deg, var(--color-accent-light) 0%, var(--color-accent) 55%, #b8922a 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .intro__mask { display: inline-block; overflow: clip; padding-bottom: 0.06em; }
+  .intro__letter { display: inline-block; transform: translateY(110%); }
+  .intro__line { width: min(240px, 50vw); height: 1px; background: var(--color-steel-border); overflow: hidden; }
+  .intro__line span { display: block; height: 100%; background: var(--color-accent); transform: scaleX(0); transform-origin: left; }
+</style>

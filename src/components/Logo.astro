@@ -1,0 +1,35 @@
+---
+/**
+ * Logo ARIZIKI : mot-symbole en capitales romaines dorées dans un
+ * cartouche fin — repris de l'identité d'ARIZIKI EliteOffers.
+ * Pour utiliser le fichier officiel : remplacer ce composant par un <img src="/logo.svg">.
+ */
+import { site } from '../config/site';
+interface Props { class?: string; size?: 'sm' | 'lg' }
+const { class: className = '', size = 'sm' } = Astro.props;
+---
+
+<span class:list={['logo', `logo--${size}`, className]}>
+  <span class="logo__word">{site.name}</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.42em 0.78em 0.38em;
+    border: 1px solid rgb(var(--color-accent-rgb) / 0.75);
+    border-radius: 6px;
+    line-height: 1;
+  }
+  .logo--sm { font-size: 0.9375rem; }
+  .logo--lg { font-size: 1.25rem; }
+  .logo__word {
+    font-family: var(--font-brand);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    margin-right: -0.2em;
+    background: linear-gradient(180deg, var(--color-accent-light) 0%, var(--color-accent) 55%, #b8922a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+</style>

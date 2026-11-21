@@ -1,0 +1,56 @@
+---
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const m = home[lang].method;
+---
+
+<section class="method section theme-cream" id="methode" data-nav-theme="light" aria-labelledby="method-title">
+  <div class="container method__grid">
+    <header class="method__head">
+      <p class="eyebrow" data-reveal>{m.eyebrow}</p>
+      <h2 class="h-lg method__title" id="method-title" data-split>
+        {m.title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+      </h2>
+      <p class="lead" data-reveal>{m.lead}</p>
+    </header>
+
+    <ol class="method__steps" data-steps>
+      <span class="method__track" aria-hidden="true"><span class="method__progress" data-steps-progress></span></span>
+      {m.steps.map((s) => (
+        <li class="method__step" data-step>
+          <span class="method__n">{s.n}</span>
+          <div>
+            <h3 class="method__step-title">{s.title}</h3>
+            <p class="muted">{s.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .method__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px clamp(48px, 8vw, 128px); align-items: start; }
+  .method__head { position: sticky; top: calc(var(--nav-h) + 48px); display: grid; gap: 24px; justify-items: start; }
+  .method__steps { position: relative; display: grid; padding-left: 0; }
+  .method__track { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--color-fog-border); }
+  .method__progress { position: absolute; inset: 0; background: var(--color-obsidian); transform: scaleY(0); transform-origin: top; }
+  .method__step {
+    display: grid; grid-template-columns: 72px 1fr; gap: 8px;
+    padding: clamp(28px, 4vw, 48px) 0 clamp(28px, 4vw, 48px) clamp(24px, 3vw, 40px);
+    border-bottom: 1px solid var(--color-fog-border);
+  }
+  .method__step:last-child { border-bottom: 0; }
+  .method__n { font-size: var(--fs-sub); font-weight: 300; color: var(--color-graphite); font-variant-numeric: tabular-nums; transition: color 400ms var(--ease-out); line-height: 1.2; }
+  .method__step.is-active .method__n { color: var(--color-obsidian); }
+  .method__step-title { font-size: var(--fs-sub); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 10px; }
+  .method__step .muted { max-width: 40ch; }
+
+  @media (max-width: 900px) {
+    .method__grid { grid-template-columns: 1fr; }
+    .method__head { position: static; }
+    .method__step { grid-template-columns: 52px 1fr; }
+  }
+</style>

@@ -1,0 +1,11 @@
+---
+import ProductPageView from '../../components/pages/ProductPageView.astro';
+import { products } from '../../content/products';
+
+export function getStaticPaths() {
+  return products.filter((p) => p.status !== 'soon').map((p) => ({ params: { slug: p.slug } }));
+}
+const { slug } = Astro.params;
+---
+
+<ProductPageView lang="fr" slug={slug!} />

@@ -1,0 +1,79 @@
+---
+/** Illustration CSS/SVG d'un tableau de bord (squelette : produit en construction). */
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const label = { fr: 'Version de développement', en: 'Development build', de: 'Entwicklungsversion' }[lang];
+---
+
+<div class="vd" aria-hidden="true">
+  <div class="vd__window">
+    <div class="vd__chrome"><i></i><i></i><i></i><span class="vd__url"></span><span class="vd__badge">{label}</span></div>
+    <div class="vd__body">
+      <aside class="vd__side">
+        <span class="vd__brand"></span>
+        {[70, 55, 62, 48, 58].map((w, i) => <span class:list={['vd__nav', { 'is-active': i === 1 }]} style={`--w:${w}%`}></span>)}
+      </aside>
+      <div class="vd__main">
+        <div class="vd__kpis">
+          {[0, 1, 2].map((i) => (
+            <div class="vd__kpi">
+              <span class="vd__sk vd__sk--sm"></span>
+              <span class="vd__sk vd__sk--lg" style={`--w:${[62, 48, 70][i]}%`}></span>
+            </div>
+          ))}
+        </div>
+        <div class="vd__chart">
+          <svg viewBox="0 0 320 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="vd-area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d4af37" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <g stroke="#26272c" stroke-width="1">
+              <line x1="0" y1="30" x2="320" y2="30" /><line x1="0" y1="60" x2="320" y2="60" /><line x1="0" y1="90" x2="320" y2="90" />
+            </g>
+            <path class="vd__area" data-chart-area d="M0,96 C30,92 46,80 72,82 C100,84 116,64 144,62 C172,60 186,70 212,52 C238,34 262,40 288,26 C302,19 312,16 320,14 L320,120 L0,120 Z" fill="url(#vd-area)" />
+            <path class="vd__line" data-chart-line pathLength="1" d="M0,96 C30,92 46,80 72,82 C100,84 116,64 144,62 C172,60 186,70 212,52 C238,34 262,40 288,26 C302,19 312,16 320,14" fill="none" stroke="#d4af37" stroke-width="2" vector-effect="non-scaling-stroke" />
+          </svg>
+        </div>
+        <div class="vd__rows">
+          {[80, 64, 72].map((w) => <div class="vd__row"><span class="vd__dot"></span><span class="vd__sk" style={`--w:${w}%`}></span><span class="vd__sk vd__sk--xs"></span></div>)}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vd { width: 100%; height: 100%; display: grid; place-items: center; }
+  .vd__window {
+    width: min(520px, 96%); border-radius: var(--r-card); overflow: hidden;
+    background: #0f1013; border: 1px solid var(--color-steel-border);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8);
+  }
+  .vd__chrome { display: flex; align-items: center; gap: 6px; padding: 12px 14px; border-bottom: 1px solid var(--color-steel-border); }
+  .vd__chrome i { width: 8px; height: 8px; border-radius: 50%; background: #2a2b30; }
+  .vd__url { margin-left: 12px; height: 8px; width: 34%; border-radius: 4px; background: #1d1e22; }
+  .vd__badge { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-light); padding: 3px 8px; border-radius: 99px; border: 1px dashed rgb(var(--color-accent-rgb) / 0.5); }
+  .vd__body { display: grid; grid-template-columns: 26% 1fr; min-height: 260px; }
+  .vd__side { padding: 16px 12px; border-right: 1px solid var(--color-steel-border); display: flex; flex-direction: column; gap: 12px; }
+  .vd__brand { width: 22px; height: 22px; border-radius: 6px; background: #22242a; margin-bottom: 8px; }
+  .vd__nav { height: 7px; width: var(--w); border-radius: 4px; background: #202126; }
+  .vd__nav.is-active { background: var(--color-accent); opacity: 0.9; }
+  .vd__main { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .vd__kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .vd__kpi { padding: 12px; border-radius: 8px; background: #15161a; border: 1px solid #222329; display: grid; gap: 8px; }
+  .vd__sk { display: block; height: 7px; width: var(--w, 60%); border-radius: 4px; background: #24262c; }
+  .vd__sk--sm { width: 45%; height: 5px; }
+  .vd__sk--lg { height: 12px; background: #34363e; }
+  .vd__sk--xs { width: 14%; margin-left: auto; }
+  .vd__chart { height: 110px; border-radius: 8px; background: #121317; border: 1px solid #222329; padding: 8px 0 0; overflow: hidden; }
+  .vd__chart svg { width: 100%; height: 100%; }
+  .vd__line { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .vd__rows { display: grid; gap: 10px; }
+  .vd__row { display: flex; align-items: center; gap: 10px; }
+  .vd__dot { width: 6px; height: 6px; border-radius: 50%; background: #3a3c44; flex: none; }
+  .vd__row .vd__sk:not(.vd__sk--xs) { width: var(--w); max-width: 60%; }
+</style>

@@ -1,0 +1,74 @@
+---
+/**
+ * Illustration CSS d'ARIZIKI EliteOffers : un funnel IA généré en un clic,
+ * devant deux offres d'affiliation. Aucune image à charger.
+ */
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = {
+  fr: { label: 'Funnel IA', chip: '1 clic', title: 'Offre high-ticket', steps: ['Page de capture', 'Séquence e-mail', 'Page de vente'], com: 'Commission', max: "jusqu'à 75 %", net: "Réseau d'affiliation" },
+  en: { label: 'AI funnel', chip: '1 click', title: 'High-ticket offer', steps: ['Opt-in page', 'Email sequence', 'Sales page'], com: 'Commission', max: 'up to 75%', net: 'Affiliate network' },
+  de: { label: 'KI-Funnel', chip: '1 Klick', title: 'High-Ticket-Angebot', steps: ['Opt-in-Seite', 'E-Mail-Sequenz', 'Verkaufsseite'], com: 'Provision', max: 'bis zu 75 %', net: 'Affiliate-Netzwerk' },
+}[lang];
+---
+
+<div class="vo" aria-hidden="true">
+  {[3, 2].map((n) => (
+    <div class={`vo__card vo__card--${n}`} data-fan={n}>
+      <div class="vo__top"><span class="vo__label">{t.net}</span></div>
+      <span class="vo__sk" style="--w:70%"></span>
+      <span class="vo__sk" style="--w:46%"></span>
+      <div class="vo__foot"><span>{t.com}</span><strong>{n === 2 ? '60 %' : '40 %'}</strong></div>
+    </div>
+  ))}
+  <div class="vo__card vo__card--1" data-fan="1">
+    <div class="vo__top">
+      <span class="vo__label">{t.label}</span>
+      <span class="vo__chip"><i></i>{t.chip}</span>
+    </div>
+    <div class="vo__title">{t.title}</div>
+    <ol class="vo__steps">
+      {t.steps.map((s, i) => (
+        <li class="vo__step" style={`--i:${i}`}>
+          <span class="vo__check"><svg viewBox="0 0 12 12" width="10" height="10"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          {s}
+        </li>
+      ))}
+    </ol>
+    <div class="vo__foot"><span>{t.com}</span><strong>{t.max}</strong></div>
+  </div>
+</div>
+
+<style>
+  .vo { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .vo__card {
+    grid-area: 1 / 1;
+    width: min(310px, 78%);
+    padding: 20px; border-radius: var(--r-card);
+    background: linear-gradient(180deg, #1b1a17 0%, #121214 100%);
+    border: 1px solid var(--color-steel-border);
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.7);
+    color: var(--color-paper);
+    will-change: transform;
+  }
+  .vo__card--1 { z-index: 3; border-color: rgb(var(--color-accent-rgb) / 0.35); }
+  .vo__card--2 { z-index: 2; transform: translate(-18%, 8%) rotate(-7deg) scale(0.92); opacity: 0.75; }
+  .vo__card--3 { z-index: 1; transform: translate(18%, 12%) rotate(7deg) scale(0.88); opacity: 0.5; }
+  .vo__card--2, .vo__card--3 { display: grid; gap: 12px; }
+  .vo__top { display: flex; justify-content: space-between; align-items: center; }
+  .vo__label { font-size: 10px; font-weight: 700; letter-spacing: 0.125em; text-transform: uppercase; color: var(--color-stone); }
+  .vo__chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 99px; background: rgb(var(--color-accent-rgb) / 0.14); color: var(--color-accent-light); }
+  .vo__chip i { width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); }
+  .vo__title { margin-top: 16px; font-size: 1.25rem; font-weight: 400; letter-spacing: -0.015em; }
+  .vo__steps { margin-top: 16px; display: grid; gap: 8px; }
+  .vo__step {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px; background: #1d1c1a; border: 1px solid #2a2925;
+    font-size: 13px; color: #d8d6d0;
+  }
+  .vo__check { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--color-accent); color: #0b0b0c; flex: none; }
+  .vo__sk { display: block; height: 8px; width: var(--w); border-radius: 4px; background: #2a2a2e; }
+  .vo__foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--color-steel-border); display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--color-stone); }
+  .vo__foot strong { font-weight: 500; font-size: 14px; color: var(--color-accent-light); }
+</style>

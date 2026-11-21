@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../PageHero.astro';
+import ContactForm from '../ContactForm.astro';
+import { contact } from '../../content/contact';
+import { products, productName } from '../../content/products';
+import { site } from '../../config/site';
+import { route, alternatesFor } from '../../i18n/routes';
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const c = contact[lang];
+---
+
+<Base lang={lang} title={c.seo.title} description={c.seo.description} alternates={alternatesFor('contact')}>
+  <PageHero eyebrow={c.hero.eyebrow} title={c.hero.title} lead={c.hero.lead} compact />
+
+  <section class="contact section theme-cream" data-nav-theme="light" aria-label={c.hero.eyebrow}>
+    <div class="container contact__grid">
+      <div class="contact__form" data-reveal>
+        <ContactForm lang={lang} />
+      </div>
+      <aside class="contact__aside">
+        <div class="contact__block" data-reveal>
+          <p class="eyebrow">{c.aside.emailTitle}</p>
+          <a class="contact__mail" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        </div>
+        <div class="contact__block" data-reveal>
+          <p class="eyebrow">{c.aside.productsTitle}</p>
+          <ul class="contact__products">
+            {products.filter((p) => p.status !== 'soon').map((p) => (
+              <li>
+                <a href={route(lang, 'product', p.slug)}>
+                  <span>{productName(p, lang)}</span>
+                  <span class="contact__status">{p.text[lang].status}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p class="contact__note" data-reveal>{c.aside.note}</p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 48px clamp(48px, 8vw, 128px); align-items: start; }
+  .contact__form { background: var(--color-paper); border: 1px solid var(--color-fog-border); border-radius: var(--r-container); padding: clamp(24px, 4vw, 48px); }
+  .contact__aside { display: grid; gap: 40px; position: sticky; top: calc(var(--nav-h) + 32px); }
+  .contact__block { display: grid; gap: 14px; justify-items: start; }
+  .contact__mail { font-size: var(--fs-sub); font-weight: 400; letter-spacing: -0.01em; word-break: break-all; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 1px; transition: background-size 400ms var(--ease-out); }
+  .contact__mail:hover { background-size: 100% 1px; }
+  .contact__products { width: 100%; border-top: 1px solid var(--color-fog-border); }
+  .contact__products a { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--color-fog-border); transition: padding 300ms var(--ease-out); }
+  .contact__products a:hover { padding-left: 8px; }
+  .contact__status { font-size: var(--fs-label); font-weight: 700; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--color-graphite); align-self: center; }
+  .contact__note { font-size: var(--fs-body-sm); color: var(--color-graphite); }
+  @media (max-width: 900px) { .contact__grid { grid-template-columns: 1fr; } .contact__aside { position: static; } }
+</style>

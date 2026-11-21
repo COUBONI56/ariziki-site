@@ -1,0 +1,207 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../PageHero.astro';
+import SectionHead from '../SectionHead.astro';
+import Principles from '../Principles.astro';
+import CtaFinal from '../CtaFinal.astro';
+import VisualPipeline from '../visuals/VisualPipeline.astro';
+import VisualOffers from '../visuals/VisualOffers.astro';
+import VisualDashboard from '../visuals/VisualDashboard.astro';
+import VisualOrbit from '../visuals/VisualOrbit.astro';
+import { products } from '../../content/products';
+import { productPages } from '../../content/productPages';
+import { route, alternatesFor } from '../../i18n/routes';
+import type { Locale } from '../../i18n';
+
+interface Props { lang: Locale; slug: string }
+const { lang, slug } = Astro.props;
+const product = products.find((p) => p.slug === slug)!;
+const c = productPages[slug][lang];
+const Visual = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: VisualDashboard, orbit: VisualOrbit }[product.visual];
+const live = product.status === 'live' && !!product.url;
+const primaryHref = live ? product.url! : `${route(lang, 'contact')}?subject=${slug}`;
+const secondaryHref = live ? `${route(lang, 'contact')}?subject=${slug}` : `${route(lang, 'home')}#ecosysteme`;
+const ext = live ? { target: '_blank', rel: 'noopener' } : {};
+---
+
+<Base lang={lang} title={c.seo.title} description={c.seo.description} alternates={alternatesFor('product', slug)}>
+  <PageHero eyebrow={c.hero.eyebrow} title={c.hero.title} lead={c.hero.lead}>
+    <Fragment slot="actions">
+      <a class="btn" href={primaryHref} data-magnetic {...ext}>
+        <span class="btn__label">{c.hero.primary}</span>
+        <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">{live ? <path d="M3 11L11 3M5 3h6v6" fill="none" stroke="currentColor" stroke-width="1.4"/> : <path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.4"/>}</svg>
+      </a>
+      <a class="link-ghost" href={secondaryHref}>{c.hero.secondary} <span class="arrow" aria-hidden="true">→</span></a>
+    </Fragment>
+    <Fragment slot="visual"><div data-pcard-visual style="height:100%"><Visual lang={lang} /></div></Fragment>
+  </PageHero>
+
+  {c.stats && (
+    <section class="stats section theme-cream" data-nav-theme="light" aria-label={c.hero.eyebrow}>
+      <div class="container">
+        <ul class="stats__grid">
+          {c.stats.items.map((s) => (
+            <li class="stats__item" data-reveal>
+              <span class="stats__value">
+                {typeof s.value === 'number' ? <><span data-count={s.value}>{s.value}</span>{s.suffix ?? ''}</> : s.value}
+              </span>
+              <span class="stats__label">{s.label}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="stats__note" data-reveal>{c.stats.disclaimer}</p>
+      </div>
+    </section>
+  )}
+
+  {c.steps && (
+    <section class="steps section theme-dark" data-nav-theme="dark" aria-labelledby="steps-title">
+      <div class="container">
+        <SectionHead eyebrow={c.steps.eyebrow} title={c.steps.title} id="steps-title" />
+        <ol class="steps__grid" data-cards style={`--cols:${c.steps.items.length}`}>
+          {c.steps.items.map((it, i) => (
+            <li class="steps__item" data-card>
+              <span class="steps__n">0{i + 1}</span>
+              <h3 class="steps__title">{it.title}</h3>
+              <p class="muted">{it.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  {c.features && (
+    <section class="features section theme-paper" data-nav-theme="light" aria-labelledby="features-title">
+      <div class="container">
+        <SectionHead eyebrow={c.features.eyebrow} title={c.features.title} id="features-title" />
+        <ul class="features__grid" data-cards>
+          {c.features.items.map((it, i) => (
+            <li class="features__card" data-card>
+              <span class="features__n">0{i + 1}</span>
+              <h3 class="features__title">{it.title}</h3>
+              <p class="muted">{it.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {c.pricing && (
+    <section class="pricing section theme-cream" data-nav-theme="light" aria-labelledby="pricing-title">
+      <div class="container">
+        <SectionHead eyebrow={c.pricing.eyebrow} title={c.pricing.title} lead={c.pricing.lead} id="pricing-title" />
+        <ul class="pricing__grid" data-cards>
+          {c.pricing.plans.map((plan, i) => (
+            <li class:list={['plan', { 'plan--featured': plan.featured }]} data-card>
+              {plan.featured && <span class="plan__badge">{c.pricing!.badge}</span>}
+              <span class="plan__n">0{i + 1}</span>
+              <h3 class="plan__name">{plan.name}</h3>
+              <p class="plan__audience">{plan.audience}</p>
+              <p class="plan__price"><span>{plan.price}</span> <small>{c.pricing!.period}</small></p>
+              <a class:list={['btn', 'plan__cta', { 'btn--dark': !plan.featured }]} href={product.url} target="_blank" rel="noopener">
+                <span class="btn__label">{plan.cta}</span>
+                <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 11L11 3M5 3h6v6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              </a>
+              <p class="plan__inc">{c.pricing!.includedTitle}</p>
+              <ul class="plan__list">
+                {c.pricing!.included.map((f) => <li><span aria-hidden="true">✓</span>{f}</li>)}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <p class="pricing__note" data-reveal>{c.pricing.note}</p>
+      </div>
+    </section>
+  )}
+
+  {c.roadmap && (
+    <section class="roadmap section theme-cream" data-nav-theme="light" aria-labelledby="roadmap-title">
+      <div class="container">
+        <SectionHead eyebrow={c.roadmap.eyebrow} title={c.roadmap.title} id="roadmap-title" />
+        <ol class="roadmap__track">
+          {c.roadmap.items.map((r) => (
+            <li class:list={['roadmap__step', `is-${r.state}`]} data-reveal>
+              <span class="roadmap__dot" aria-hidden="true"></span>
+              <span class="roadmap__title">{r.title}</span>
+              <span class="roadmap__label">{r.label}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  {product.status !== 'live' && <Principles lang={lang} />}
+
+  <CtaFinal lang={lang} eyebrow={c.cta.eyebrow} title={c.cta.title} lead={c.cta.lead} button={c.cta.button} href={primaryHref} external={live} />
+</Base>
+
+<style>
+  .stats__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--color-fog-border); }
+  .stats__item { display: grid; gap: 10px; padding: 36px 24px 8px 0; }
+  .stats__item + .stats__item { padding-left: 24px; border-left: 1px solid var(--color-fog-border); }
+  .stats__value { font-size: clamp(2.75rem, 1.5rem + 4vw, 5rem); font-weight: 300; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stats__label { color: var(--color-graphite); }
+  .stats__note { margin-top: 40px; font-size: var(--fs-caption); color: var(--color-graphite); }
+
+  .steps__grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 16px; }
+  .steps__item { position: relative; display: grid; gap: 12px; align-content: start; padding: 32px; border-radius: var(--r-card); background: #111112; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06); min-height: 260px; }
+  .steps__n { font-size: var(--fs-caption); color: var(--color-accent-light); margin-bottom: auto; padding-bottom: 48px; font-variant-numeric: tabular-nums; }
+  .steps__title { font-size: var(--fs-sub); font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; }
+
+  .features__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .features__card { display: grid; gap: 10px; align-content: start; min-height: 240px; padding: 28px; border-radius: var(--r-card); background: var(--color-cream); border: 1px solid var(--color-fog-border); transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out); }
+  .features__card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .features__n { font-size: var(--fs-caption); color: var(--color-graphite); margin-bottom: auto; padding-bottom: 40px; }
+  .features__title { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; }
+
+  .pricing__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .plan { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 32px; border-radius: var(--r-container); background: var(--color-paper); border: 1px solid var(--color-fog-border); }
+  .plan--featured { background: var(--color-obsidian); color: var(--color-paper); border-color: rgb(var(--color-accent-rgb) / 0.6); box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.45); }
+  .plan__badge { position: absolute; top: -13px; left: 32px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--color-accent); color: var(--color-obsidian); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .plan__n { font-size: var(--fs-caption); color: var(--color-graphite); font-variant-numeric: tabular-nums; }
+  .plan--featured .plan__n, .plan--featured .plan__audience, .plan--featured .plan__inc, .plan--featured .plan__price small { color: var(--color-stone); }
+  .plan__name { font-size: var(--fs-sub); font-weight: 500; letter-spacing: -0.01em; margin-top: 8px; }
+  .plan__audience { color: var(--color-graphite); min-height: 3em; }
+  .plan__price { margin: 18px 0 8px; display: flex; align-items: baseline; gap: 8px; }
+  .plan__price span { font-size: clamp(2.5rem, 1.6rem + 2.6vw, 3.5rem); font-weight: 300; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .plan__price small { font-size: var(--fs-body-sm); color: var(--color-graphite); }
+  .plan__cta { justify-content: space-between; margin: 8px 0 24px; }
+  .plan__inc { font-size: var(--fs-label); font-weight: 700; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--color-graphite); padding-top: 20px; border-top: 1px solid var(--color-fog-border); }
+  .plan--featured .plan__inc { border-top-color: var(--color-steel-border); }
+  .plan__list { display: grid; gap: 10px; }
+  .plan__list li { display: flex; gap: 10px; font-size: var(--fs-body-sm); line-height: 1.5; }
+  .plan__list span { color: var(--color-obsidian); font-weight: 700; }
+  .plan--featured .plan__list span { color: var(--color-accent); }
+  .pricing__note { margin-top: 32px; font-size: var(--fs-caption); color: var(--color-graphite); }
+
+  .roadmap__track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: relative; }
+  .roadmap__track::before { content: ''; position: absolute; left: 0; right: 0; top: 7px; height: 1px; background: var(--color-fog-border); }
+  .roadmap__step { position: relative; display: grid; gap: 8px; padding-right: 16px; }
+  .roadmap__dot { width: 15px; height: 15px; border-radius: 50%; background: var(--color-cream); border: 1.5px solid var(--color-ash); margin-bottom: 18px; }
+  .roadmap__step.is-done .roadmap__dot { background: var(--color-obsidian); border-color: var(--color-obsidian); }
+  .roadmap__step.is-current .roadmap__dot { background: var(--color-accent); border-color: var(--color-accent); box-shadow: 0 0 0 6px rgb(var(--color-accent-rgb) / 0.2); }
+  .roadmap__title { font-size: var(--fs-sub); font-weight: 400; letter-spacing: -0.01em; }
+  .roadmap__label { font-size: var(--fs-label); font-weight: 700; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--color-graphite); }
+
+  @media (max-width: 1100px) { .steps__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 1000px) {
+    .pricing__grid { grid-template-columns: 1fr; max-width: 30rem; }
+    .plan__audience { min-height: 0; }
+    .stats__grid, .features__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats__item:nth-child(3) { padding-left: 0; border-left: 0; }
+    .steps__item { min-height: 0; }
+    .steps__n { padding-bottom: 20px; }
+  }
+  @media (max-width: 600px) {
+    .steps__grid { grid-template-columns: 1fr; }
+    .features__grid { grid-template-columns: 1fr; }
+    .features__card { min-height: 0; }
+    .roadmap__track { grid-template-columns: 1fr; gap: 28px; padding-left: 32px; }
+    .roadmap__track::before { left: 7px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+    .roadmap__step { padding-right: 0; }
+    .roadmap__dot { position: absolute; left: -32px; top: 6px; margin: 0; }
+  }
+</style>

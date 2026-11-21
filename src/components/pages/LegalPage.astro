@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../PageHero.astro';
+import { legalNotice, privacyPolicy } from '../../content/legal';
+import { site } from '../../config/site';
+import { route, alternatesFor } from '../../i18n/routes';
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale; doc: 'legal' | 'privacy' }
+const { lang, doc } = Astro.props;
+const d = (doc === 'legal' ? legalNotice : privacyPolicy)[lang];
+const L = site.legal;
+const tokens: Record<string, string> = {
+  owner: L.owner, address: L.address, siret: L.siret, phone: L.phone, email: site.contact.email,
+  status: L.status[lang], vat: L.vat[lang], hostName: L.host.name, hostAddress: L.host.address, hostUrl: L.host.url,
+};
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** Remplace les jetons ; une valeur [à compléter] est surlignée. */
+const fill = (text: string) =>
+  esc(text).replace(/\{(\w+)\}/g, (_, k) => {
+    const v = tokens[k] ?? '';
+    if (v.startsWith('[')) return `<mark class="todo">${esc(v)}</mark>`;
+    if (k === 'email') return `<a href="mailto:${v}">${esc(v)}</a>`;
+    if (k === 'hostUrl') return `<a href="${v}" rel="noopener" target="_blank">${esc(v.replace(/^https?:\/\//, ''))}</a>`;
+    return esc(v);
+  });
+const otherHref = route(lang, doc === 'legal' ? 'privacy' : 'legal');
+---
+
+<Base lang={lang} title={d.seo.title} description={d.seo.description} alternates={alternatesFor(doc)}>
+  <PageHero eyebrow={d.eyebrow} title={[d.title]} lead={d.updated} compact />
+  <section class="legal section theme-paper" data-nav-theme="light">
+    <div class="container">
+      <article class="legal__doc">
+        {d.sections.map((s, i) => (
+          <section class="legal__section" data-reveal>
+            <h2 class="legal__h"><span class="legal__n">0{i + 1}</span>{s.h}</h2>
+            {s.p.map((p) => <p set:html={fill(p)} />)}
+            {/(confidentialité|privacy policy|Datenschutzerklärung)\.$/.test(s.p[s.p.length - 1]) && doc === 'legal' && (
+              <p><a class="link-ghost" href={otherHref}>{privacyPolicy[lang].title} <span class="arrow" aria-hidden="true">→</span></a></p>
+            )}
+          </section>
+        ))}
+      </article>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .legal__doc { max-width: 48rem; display: grid; gap: 8px; }
+  .legal__section { padding: 32px 0; border-top: 1px solid var(--color-fog-border); }
+  .legal__h { display: flex; gap: 18px; align-items: baseline; font-size: var(--fs-sub); font-weight: 500; letter-spacing: -0.01em; margin-bottom: 14px; }
+  .legal__n { font-size: var(--fs-caption); color: var(--color-graphite); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .legal__section p { color: #3d3c3a; max-width: 64ch; }
+  .legal__section p + p { margin-top: 8px; }
+  .legal__section :global(a) { text-decoration: underline; text-underline-offset: 3px; }
+  .legal__section :global(a.link-ghost) { text-decoration: none; }
+  .legal__section :global(mark.todo) { background: rgb(var(--color-accent-rgb) / 0.28); color: var(--color-obsidian); padding: 0 4px; border-radius: 3px; }
+</style>

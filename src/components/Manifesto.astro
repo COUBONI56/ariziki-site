@@ -1,0 +1,50 @@
+---
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const m = home[lang].manifesto;
+---
+
+<section class="manifesto section theme-cream" id="manifeste" data-nav-theme="light" aria-labelledby="manifesto-title">
+  <div class="container">
+    <p class="eyebrow" data-reveal>{m.eyebrow}</p>
+    <h2 class="sr-only" id="manifesto-title">{m.eyebrow}</h2>
+    <p class="manifesto__text h" data-words>
+      {m.text.split(' ').map((w, i, arr) => (
+        <Fragment><span class="word">{w}</span>{i < arr.length - 1 ? ' ' : ''}</Fragment>
+      ))}
+    </p>
+
+    <div class="manifesto__aside">
+      {m.aside.map((a, i) => (
+        <div class="manifesto__col" data-reveal>
+          <span class="manifesto__n">0{i + 1}</span>
+          <h3 class="manifesto__title">{a.title}</h3>
+          <p class="muted">{a.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .manifesto {
+    z-index: 2;
+    border-radius: var(--r-container) var(--r-container) 0 0;
+    margin-top: calc(var(--r-container) * -1);
+  }
+  .manifesto__text { margin-top: 28px; max-width: 1100px; }
+  .manifesto__text :global(.word) { display: inline-block; }
+  .manifesto__aside {
+    margin-top: clamp(64px, 8vw, 120px);
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 64px;
+    padding-top: 32px; border-top: 1px solid var(--color-fog-border);
+    max-width: 920px; margin-left: auto;
+  }
+  .manifesto__n { font-size: var(--fs-caption); color: var(--color-graphite); font-variant-numeric: tabular-nums; }
+  .manifesto__title { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; margin: 10px 0 8px; }
+  @media (max-width: 720px) {
+    .manifesto__aside { grid-template-columns: 1fr; }
+  }
+</style>
