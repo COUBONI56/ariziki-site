@@ -7,7 +7,7 @@
 import type { Locale } from './index';
 import { route, type RouteKey } from './routes';
 
-export type NavItem = { label: string; to: RouteKey; slug?: string; hash?: string };
+export type NavItem = { label: string; to: RouteKey; slug?: string; hash?: string; href?: string };
 
 export type UI = {
   seo: { title: string; description: string };
@@ -18,7 +18,7 @@ export type UI = {
 };
 
 /** Calcule l'URL d'un lien de menu dans une langue */
-export const linkHref = (lang: Locale, item: NavItem) => `${route(lang, item.to, item.slug)}${item.hash ? `#${item.hash}` : ''}`;
+export const linkHref = (lang: Locale, item: NavItem) => item.href ?? `${route(lang, item.to, item.slug)}${item.hash ? `#${item.hash}` : ''}`;
 
 export const ui: Record<Locale, UI> = {
   fr: {
@@ -46,6 +46,7 @@ export const ui: Record<Locale, UI> = {
           { label: 'À propos', to: 'about' },
           { label: 'Manifeste', to: 'home', hash: 'manifeste' },
           { label: 'Contact', to: 'contact' },
+          { label: 'Création de sites premium', to: 'home', href: 'https://arizikismartness.com' },
         ] },
         { title: 'Légal', links: [
           { label: 'Mentions légales', to: 'legal' },
@@ -82,6 +83,7 @@ export const ui: Record<Locale, UI> = {
           { label: 'About', to: 'about' },
           { label: 'Manifesto', to: 'home', hash: 'manifeste' },
           { label: 'Contact', to: 'contact' },
+          { label: 'Premium web design studio', to: 'home', href: 'https://arizikismartness.com' },
         ] },
         { title: 'Legal', links: [
           { label: 'Legal notice', to: 'legal' },
@@ -118,6 +120,7 @@ export const ui: Record<Locale, UI> = {
           { label: 'Über uns', to: 'about' },
           { label: 'Manifest', to: 'home', hash: 'manifeste' },
           { label: 'Kontakt', to: 'contact' },
+          { label: 'Premium-Webdesign-Studio', to: 'home', href: 'https://arizikismartness.com' },
         ] },
         { title: 'Rechtliches', links: [
           { label: 'Impressum', to: 'legal' },
