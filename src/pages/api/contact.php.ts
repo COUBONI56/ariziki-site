@@ -2,7 +2,7 @@
  * Génère /api/contact.php au moment du build.
  * Ce script PHP est exécuté par l'hébergement Hostinger : il valide le
  * formulaire, filtre le spam et envoie le message par e-mail.
- * Le destinataire vient de src/config/site.ts (contact.email).
+ * Le destinataire vient de src/config/site.ts (contact.formRecipient).
  */
 import type { APIRoute } from 'astro';
 import { site } from '../../config/site';
@@ -14,7 +14,7 @@ declare(strict_types=1);
 //  Formulaire de contact ${site.name} — fichier généré, ne pas modifier ici :
 //  changez l'adresse dans src/config/site.ts puis relancez le build.
 // ─────────────────────────────────────────────────────────────
-$TO     = ${JSON.stringify(site.contact.email)};
+$TO     = ${JSON.stringify(site.contact.formRecipient)};
 $FROM   = ${JSON.stringify(site.contact.formSender)};
 $COPY   = ${JSON.stringify(site.contact.formCopy)};
 $SITE   = ${JSON.stringify(site.name)};

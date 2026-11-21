@@ -23,9 +23,9 @@ Ou demander simplement à Claude : « publie la modification sur ariziki.com ».
 - Dans `/api/`, seul `contact.php` est accessible.
 
 ## Formulaire de contact
-- `/api/contact.php` est généré au build depuis `src/config/site.ts` (destinataire = `contact.email`).
+- `/api/contact.php` est généré au build depuis `src/config/site.ts` (destinataire = `contact.formRecipient`, soit contacts@ariziki.com).
+- Un **transfert Hostinger** (hPanel → E-mails → contacts@ariziki.com → Transferts) renvoie chaque message vers ourotchanile@yahoo.com, en gardant une copie. Yahoo refuse les e-mails envoyés directement par le serveur web : ne pas remettre l'adresse Yahoo comme destinataire.
 - Envoi via la fonction `mail()` de PHP d’Hostinger. Expéditeur et copie de sécurité : `contacts@ariziki.com` (boîte Hostinger).
-- Chaque message arrive aussi dans la boîte contacts@ariziki.com (webmail Hostinger) : aucun message perdu.
 
 ## Après la mise en ligne
 - Google Search Console : ajouter ariziki.com et soumettre `https://ariziki.com/sitemap-index.xml`.

@@ -13,12 +13,16 @@ export const site = {
   ogImage: '/og.jpg',
 
   contact: {
-    // ✏️  Adresse affichée sur tout le site ET destinataire du formulaire de contact.
+    // ✏️  Adresse affichée sur tout le site.
     email: 'ourotchanile@yahoo.com',
+    // ✏️  Destinataire du formulaire : la boîte Hostinger du domaine (livraison fiable).
+    //     Un transfert Hostinger renvoie ensuite chaque message vers votre Yahoo.
+    //     (Yahoo refuse les e-mails envoyés directement par un serveur web.)
+    formRecipient: 'contacts@ariziki.com',
     // ✏️  Expéditeur des e-mails du formulaire : une vraie boîte Hostinger du domaine.
     formSender: 'contacts@ariziki.com',
-    // ✏️  Copie de sécurité de chaque message (boîte Hostinger). Mettre '' pour désactiver.
-    formCopy: 'contacts@ariziki.com',
+    // ✏️  Copie supplémentaire (facultatif). '' = aucune.
+    formCopy: '',
   },
 
   /**
