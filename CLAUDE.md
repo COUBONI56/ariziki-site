@@ -1,6 +1,6 @@
 # ariziki.com — instructions pour l'agent (Claude Code / Antigravity)
 
-Site vitrine premium d'ARIZIKI, marque-mère de plusieurs SaaS (ARIZIKI EliteOffers, NOVARYS…).
+Site vitrine premium d'ARIZIKI, marque-mère de plusieurs SaaS (ARIZIKI EliteOffers, Cibleflow, NOVARYS…).
 ARIZIKI signifie « richesse » : l'or est la couleur d'accent de la marque.
 
 ## Stack
@@ -8,8 +8,9 @@ ARIZIKI signifie « richesse » : l'or est la couleur d'accent de la marque.
 - **GSAP + ScrollTrigger** pour les animations, **Lenis** pour le défilement fluide (`src/scripts/motion.ts`).
 - Polices auto-hébergées : Hanken Grotesk (texte), Cinzel (mot-symbole du logo uniquement).
 - Langues : FR (racine), EN (`/en/`), DE (`/de/`), URL traduites (`/a-propos/`, `/en/about/`, `/de/ueber-uns/`).
-- Pages : accueil, à propos, produits (EliteOffers, NOVARYS), contact (formulaire PHP), mentions légales, confidentialité, 404.
+- Pages : accueil, à propos, produits (EliteOffers, Cibleflow, NOVARYS), contact (formulaire PHP), mentions légales, confidentialité, 404.
 - Hébergement : Hostinger (plan Business). Déploiement : voir `docs/DEPLOIEMENT-HOSTINGER.md`.
+- Git : branche `main` = code source ; branche `production` = contenu de `dist/`, publié sur ariziki.com.
 
 ## Commandes
 - `npm install` puis `npm run dev` → http://localhost:4321
