@@ -13,8 +13,9 @@ export const site = {
   ogImage: '/og.jpg',
 
   contact: {
-    // ✏️  Adresse affichée sur tout le site.
-    email: 'ourotchanile@yahoo.com',
+    // ✏️  Adresse affichée sur tout le site (les messages sont transférés
+    //     automatiquement vers la boîte Yahoo personnelle par Hostinger).
+    email: 'contacts@ariziki.com',
     // ✏️  Destinataire du formulaire : la boîte Hostinger du domaine (livraison fiable).
     //     Un transfert Hostinger renvoie ensuite chaque message vers votre Yahoo.
     //     (Yahoo refuse les e-mails envoyés directement par un serveur web.)
