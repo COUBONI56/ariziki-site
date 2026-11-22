@@ -13,10 +13,24 @@ const tokens: Record<string, string> = {
   owner: L.owner, address: L.address, siret: L.siret, phone: L.phone, email: site.contact.email,
   status: L.status[lang], vat: L.vat[lang], hostName: L.host.name, hostAddress: L.host.address, hostUrl: L.host.url,
 };
+/** Champs pas encore disponibles (valeur '') : mention « en cours » dans chaque langue. */
+const pending = {
+  address: { fr: "Entreprise en cours d'immatriculation", en: 'Business registration in progress', de: 'Unternehmen im Eintragungsverfahren' },
+  siret: { fr: "en cours d'attribution", en: 'being assigned', de: 'wird derzeit zugeteilt' },
+};
+if (!L.address) tokens.address = pending.address[lang];
+if (!L.siret) tokens.siret = pending.siret[lang];
+/** Retire ce qui n'a pas lieu d'être tant qu'un champ est vide (téléphone, adresse dans la ligne RGPD). */
+const tidy = (text: string) => {
+  let t = text;
+  if (!L.phone) t = t.replace(/^[^{]*\{phone\}\s*·\s*/, '');
+  if (!L.address) t = t.replace(' — {address}', '');
+  return t;
+};
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 /** Remplace les jetons ; une valeur [à compléter] est surlignée. */
 const fill = (text: string) =>
-  esc(text).replace(/\{(\w+)\}/g, (_, k) => {
+  esc(tidy(text)).replace(/\{(\w+)\}/g, (_, k) => {
     const v = tokens[k] ?? '';
     if (v.startsWith('[')) return `<mark class="todo">${esc(v)}</mark>`;
     if (k === 'email') return `<a href="mailto:${v}">${esc(v)}</a>`;

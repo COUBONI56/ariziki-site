@@ -11,7 +11,7 @@ import type { Locale } from '../i18n';
 
 export type LegalDoc = { seo: { title: string; description: string }; eyebrow: string; title: string; updated: string; sections: { h: string; p: string[] }[] };
 
-const UPDATED = { fr: 'Dernière mise à jour : 21 novembre 2026', en: 'Last updated: 21 November 2026', de: 'Stand: 21. November 2026' };
+const UPDATED = { fr: 'Dernière mise à jour : 23 novembre 2026', en: 'Last updated: 23 November 2026', de: 'Stand: 23. November 2026' };
 
 export const legalNotice: Record<Locale, LegalDoc> = {
   fr: {
