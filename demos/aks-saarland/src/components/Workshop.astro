@@ -1,0 +1,75 @@
+---
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const w = home[Astro.props.lang].workshop;
+const words = w.statement.split(' ');
+---
+<section class="workshop section theme-concrete grid-bg" id="werkstatt" data-nav-theme="light" aria-labelledby="werkstatt-title">
+  <div class="container">
+    <header class="workshop__head">
+      <p class="eyebrow" data-reveal>{w.eyebrow}</p>
+      <h2 class="h" id="werkstatt-title" data-split>
+        {w.title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+      </h2>
+    </header>
+
+    <p class="workshop__statement" data-words>
+      {words.map((word, i) => <><span class="word">{word}</span>{i < words.length - 1 ? ' ' : ''}</>)}
+    </p>
+
+    <ol class="services">
+      {w.groups.map((g, i) => (
+        <li class="service" data-card>
+          <div class="service__top">
+            <span class="service__index mono">{String(i + 1).padStart(2, '0')}</span>
+            <span class="service__count mono">{g.items.length} {w.countLabel}</span>
+          </div>
+          <h3 class="service__title h-sm">{g.title}</h3>
+          <ul class="service__list">
+            {g.items.map((it) => <li>{it}</li>)}
+          </ul>
+          <span class="service__corner" aria-hidden="true"></span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .workshop__head { display: grid; gap: 20px; max-width: 900px; }
+  .workshop__statement {
+    margin-top: clamp(48px, 7vw, 104px); margin-left: auto; max-width: 980px;
+    font-size: clamp(1.5rem, 1rem + 1.9vw, 2.75rem); line-height: 1.18; font-weight: 520; letter-spacing: -0.012em;
+  }
+  .services {
+    margin-top: clamp(56px, 8vw, 120px);
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--c-line-light); border-left: 1px solid var(--c-line-light);
+  }
+  .service {
+    position: relative; display: flex; flex-direction: column; gap: 18px; min-height: 340px;
+    padding: clamp(24px, 2.4vw, 36px);
+    border-right: 1px solid var(--c-line-light); border-bottom: 1px solid var(--c-line-light);
+    transition: background-color 400ms var(--ease-out), color 400ms var(--ease-out);
+  }
+  .service__top { display: flex; justify-content: space-between; align-items: center; color: var(--c-graphite); transition: color 400ms var(--ease-out); }
+  .service__index { font-size: 0.8125rem; font-weight: 700; color: var(--c-ink); transition: color 400ms var(--ease-out); }
+  .service__title { margin-top: 28px; }
+  .service__list { display: grid; gap: 8px; font-size: var(--fs-small); color: var(--c-graphite); transition: color 400ms var(--ease-out); }
+  .service__list li { position: relative; padding-left: 18px; }
+  .service__list li::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 8px; height: 1px; background: currentColor; }
+  .service__corner { position: absolute; right: 14px; top: 14px; width: 10px; height: 10px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; opacity: 0; transition: opacity 400ms; }
+  @media (hover: hover) {
+    .service:hover { background: var(--c-night); color: var(--c-white); }
+    .service:hover .service__index { color: var(--c-brand); }
+    .service:hover .service__top, .service:hover .service__list { color: var(--c-stone); }
+    .service:hover .service__corner { opacity: 1; color: var(--c-brand); }
+  }
+  @media (max-width: 1000px) { .services { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 620px) {
+    .services { grid-template-columns: 1fr; }
+    .service { min-height: 0; }
+  }
+</style>

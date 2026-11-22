@@ -1,0 +1,46 @@
+---
+import { partners } from '../config/site';
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const p = home[Astro.props.lang].partners;
+const half = Math.ceil(partners.length / 2);
+const rowsOf = [partners.slice(0, half), partners.slice(half)];
+---
+<section class="partners section theme-concrete" data-nav-theme="light" aria-labelledby="partner-title">
+  <div class="container partners__head">
+    <p class="eyebrow" data-reveal>{p.eyebrow}</p>
+    <h2 class="h-sm" id="partner-title" data-reveal>{p.title}</h2>
+  </div>
+  <ul class="sr-only">{partners.map((n) => <li>{n}</li>)}</ul>
+  <div class="partners__rows" aria-hidden="true">
+    {rowsOf.map((row, r) => (
+      <div class:list={['partners__row', { 'partners__row--rev': r === 1 }]}>
+        <div class="partners__track">
+          {[0, 1].map(() => row.map((n) => <span class="partners__name">{n}</span>))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .partners { padding-block: clamp(72px, 4rem + 4vw, 136px); overflow: clip; }
+  .partners__head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(32px, 4vw, 56px); }
+  .partners__rows { display: grid; gap: 4px; border-block: 1px solid var(--c-line-light); }
+  .partners__row { overflow: clip; padding-block: 14px; }
+  .partners__row + .partners__row { border-top: 1px solid var(--c-line-light); }
+  .partners__track { display: flex; width: max-content; animation: partners 70s linear infinite; }
+  .partners__row--rev .partners__track { animation-direction: reverse; animation-duration: 80s; }
+  .partners__rows:hover .partners__track { animation-play-state: paused; }
+  .partners__name {
+    padding-inline: clamp(18px, 2.4vw, 36px); position: relative;
+    font-size: clamp(1.375rem, 0.9rem + 1.6vw, 2.5rem); font-weight: 760; font-stretch: 76%; text-transform: uppercase; line-height: 1.1;
+    color: #7d8696; transition: color 250ms;
+  }
+  .partners__name::after { content: ''; position: absolute; right: -3px; top: 50%; width: 6px; height: 6px; background: var(--c-line-light); transform: translateY(-50%); }
+  .partners__name:hover { color: var(--c-ink); }
+  @keyframes partners { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .partners__track { animation: none; flex-wrap: wrap; width: auto; } }
+</style>

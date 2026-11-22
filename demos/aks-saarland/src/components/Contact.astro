@@ -1,0 +1,125 @@
+---
+import OpenStatus from './OpenStatus.astro';
+import { site } from '../config/site';
+import { home } from '../content/home';
+import { ui } from '../i18n/ui';
+import type { Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const c = home[lang].contact;
+const t = ui[lang];
+const slotFor = (days: number[]) => site.hours.find((h) => h.days.some((d) => days.includes(d)));
+const time = (s: string) => (lang === 'de' ? s : s.replace(/^0/, ''));
+---
+<section class="contact section theme-paper grid-bg" id="kontakt" data-nav-theme="light" aria-labelledby="kontakt-title">
+  <div class="container contact__grid">
+    <div class="contact__intro">
+      <p class="eyebrow" data-reveal>{c.eyebrow}</p>
+      <h2 class="h" id="kontakt-title" data-split>
+        {c.title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+      </h2>
+      <p class="lead" data-reveal>{c.lead}</p>
+
+      <dl class="contact__list" data-reveal>
+        <div>
+          <dt class="mono">{t.contact.address}</dt>
+          <dd>
+            {site.address.street}<br />{site.address.zip} {site.address.city}
+            <a class="link-line contact__route" href={site.routeUrl} target="_blank" rel="noopener">{t.contact.route} ↗</a>
+          </dd>
+        </div>
+        <div><dt class="mono">{t.contact.office}</dt><dd><a class="contact__big" href={site.phone.href}>{site.phone.display}</a></dd></div>
+        <div><dt class="mono">{t.contact.parts}</dt><dd><a class="contact__big" href={site.whatsapp.href} target="_blank" rel="noopener">{site.whatsapp.display}</a></dd></div>
+        <div><dt class="mono">{t.contact.email}</dt><dd><a class="link-line" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+      </dl>
+    </div>
+
+    <div class="contact__side">
+      <div class="hours" data-reveal>
+        <div class="hours__head">
+          <h3 class="hours__title">{t.hours.title}</h3>
+          <OpenStatus lang={lang} variant="card" />
+        </div>
+        <table class="hours__table">
+          <tbody>
+            {t.hours.rows.map((row) => {
+              const s = slotFor(row.days);
+              return (
+                <tr data-days={row.days.join(',')}>
+                  <th scope="row">{row.label}</th>
+                  <td>{s ? `${time(s.open)} – ${time(s.close)}${t.hours.suffix}` : t.hours.closed}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p class="hours__note mono">{t.hours.appointment}</p>
+      </div>
+
+      <div class="locator" aria-hidden="true" data-reveal>
+        <svg viewBox="0 0 400 260">
+          <g class="locator__grid">
+            {Array.from({ length: 9 }, (_, i) => <path d={`M${i * 50} 0V260`} />)}
+            {Array.from({ length: 6 }, (_, i) => <path d={`M0 ${i * 52}H400`} />)}
+          </g>
+          <path class="locator__road" d="M-10 196C70 180 110 150 170 140S270 112 320 60 380 20 410 14" />
+          <path class="locator__road locator__road--thin" d="M60 270C90 220 150 170 200 130S260 40 250 -10" />
+          <circle class="locator__ring" cx="200" cy="130" r="48" />
+          <circle class="locator__ring" cx="200" cy="130" r="88" />
+          <circle class="locator__pulse" cx="200" cy="130" r="14" />
+          <circle class="locator__pin" cx="200" cy="130" r="6" />
+        </svg>
+        <p class="locator__label mono">{site.address.city} · Köllertal · {site.address.region}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(40px, 6vw, 112px); }
+  .contact__intro { display: grid; gap: 24px; align-content: start; }
+  .contact__list { display: grid; margin-top: 12px; border-top: 1px solid var(--c-line-light); }
+  .contact__list > div { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding-block: 18px; border-bottom: 1px solid var(--c-line-light); }
+  .contact__list dt { color: var(--c-graphite); padding-top: 4px; }
+  .contact__list dd { line-height: 1.5; }
+  .contact__route { display: flex; width: fit-content; margin-top: 10px; font-size: var(--fs-small); }
+  .contact__big { font-size: clamp(1.375rem, 1rem + 1vw, 1.875rem); font-weight: 780; font-stretch: 78%; letter-spacing: 0.01em; }
+  .contact__big:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+  .contact__side { display: grid; gap: 16px; align-content: start; }
+  .hours { background: var(--c-night); color: var(--c-white); border-radius: var(--r-container); padding: clamp(24px, 3vw, 40px); }
+  .hours__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--c-line-dark); }
+  .hours__title { font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem); font-weight: 800; font-stretch: 76%; text-transform: uppercase; line-height: 1; }
+  .hours__table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .hours__table th, .hours__table td { padding: 14px 0; border-bottom: 1px solid var(--c-line-dark); text-align: left; font-weight: 400; }
+  .hours__table td { text-align: right; font-family: var(--font-mono); font-size: 0.875rem; color: var(--c-stone); }
+  .hours__table tr.is-today th { font-weight: 700; }
+  .hours__table tr.is-today th::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 10px; background: var(--c-brand); vertical-align: 1px; }
+  .hours__table tr.is-today td { color: var(--c-white); }
+  .hours__note { margin-top: 16px; color: var(--c-stone); }
+
+  .locator { position: relative; border: 1px solid var(--c-line-light); border-radius: var(--r-container); overflow: hidden; background: var(--c-concrete); }
+  .locator svg { width: 100%; height: auto; }
+  .locator__grid path { stroke: rgb(16 21 41 / 0.08); stroke-width: 1; }
+  .locator__road { fill: none; stroke: rgb(16 21 41 / 0.5); stroke-width: 3; stroke-linecap: round; }
+  .locator__road--thin { stroke-width: 1.5; stroke: rgb(16 21 41 / 0.3); }
+  .locator__ring { fill: none; stroke: rgb(16 21 41 / 0.22); stroke-dasharray: 3 5; }
+  .locator__pin { fill: var(--c-ink); stroke: var(--c-accent); stroke-width: 3; }
+  .locator__pulse { fill: rgb(var(--c-accent-rgb) / 0.35); transform-box: fill-box; transform-origin: center; animation: pulse 2.4s var(--ease-out) infinite; }
+  @keyframes pulse { from { transform: scale(0.6); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+  .locator__label { position: absolute; left: 16px; bottom: 14px; color: var(--c-graphite); background: var(--c-concrete); padding: 4px 8px; border-radius: 2px; }
+
+  @media (max-width: 960px) { .contact__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .contact__list > div { grid-template-columns: 1fr; gap: 6px; } }
+</style>
+
+<script>
+  // Met en évidence la ligne du jour (heure de Berlin)
+  const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(
+    new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short' }).format(new Date()),
+  );
+  document.querySelectorAll<HTMLElement>('.hours__table tr[data-days]').forEach((tr) => {
+    if (tr.dataset.days!.split(',').map(Number).includes(wd)) tr.classList.add('is-today');
+  });
+</script>

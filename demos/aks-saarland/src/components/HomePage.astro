@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Ticker from './Ticker.astro';
+import Workshop from './Workshop.astro';
+import Sales from './Sales.astro';
+import Rental from './Rental.astro';
+import Request from './Request.astro';
+import Partners from './Partners.astro';
+import Contact from './Contact.astro';
+import CtaFinal from './CtaFinal.astro';
+import { home } from '../content/home';
+import type { Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const c = home[lang];
+---
+<Base lang={lang} intro introLabel={c.intro}>
+  <Hero lang={lang} />
+  <Ticker items={c.machines} />
+  <Workshop lang={lang} />
+  <Sales lang={lang} />
+  <Rental lang={lang} />
+  <Request lang={lang} />
+  <Partners lang={lang} />
+  <Contact lang={lang} />
+  <CtaFinal lang={lang} />
+</Base>

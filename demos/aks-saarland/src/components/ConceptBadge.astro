@@ -1,0 +1,30 @@
+---
+/** Bandeau permanent : il s'agit d'une maquette, pas du site officiel. */
+import { site } from '../config/site';
+import { ui } from '../i18n/ui';
+import type { Locale } from '../i18n';
+interface Props { lang: Locale }
+const t = ui[Astro.props.lang];
+---
+<a class="concept" href={site.studio.url} title={t.conceptLong} data-concept>
+  <span class="concept__dot" aria-hidden="true"></span>
+  <span class="concept__text"><strong>{t.concept}</strong><span class="concept__studio"> · {site.studio.name}</span></span>
+  <span class="sr-only">— {t.conceptLong}</span>
+</a>
+
+<style>
+  .concept {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 9px 14px 9px 12px; border-radius: var(--r-pill);
+    background: rgb(16 21 41 / 0.88); color: var(--c-white);
+    border: 1px solid rgb(var(--c-accent-rgb) / 0.55);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;
+    transition: border-color var(--dur-fast);
+  }
+  .concept:hover { border-color: var(--c-accent); }
+  .concept strong { font-weight: 700; color: var(--c-accent); }
+  .concept__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); }
+  @media (max-width: 520px) { .concept { right: 10px; bottom: 10px; padding: 8px 12px; font-size: 0.625rem; } .concept__studio { display: none; } }
+</style>

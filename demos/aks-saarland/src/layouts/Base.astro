@@ -1,0 +1,109 @@
+---
+import '@fontsource-variable/archivo/standard.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import fontLatin from '@fontsource-variable/archivo/files/archivo-latin-standard-normal.woff2?url';
+import fontMono from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Intro from '../components/Intro.astro';
+import ConceptBadge from '../components/ConceptBadge.astro';
+import { site } from '../config/site';
+import { locales, localeMeta, homePath, withBase, defaultLocale, type Locale } from '../i18n';
+import { ui } from '../i18n/ui';
+
+interface Props {
+  lang: Locale;
+  title?: string;
+  description?: string;
+  intro?: boolean;
+  introLabel?: string;
+}
+
+const { lang, intro = false, introLabel = '' } = Astro.props;
+const t = ui[lang];
+const title = Astro.props.title ?? t.seo.title;
+const description = Astro.props.description ?? t.seo.description;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AutoRepair',
+  name: site.name,
+  email: site.email,
+  telephone: site.phone.intl,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    postalCode: site.address.zip,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    addressCountry: site.address.country,
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '18:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:00', closes: '13:00' },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={localeMeta[lang].hreflang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <!-- Konzept-Entwurf : ne doit jamais être indexé à la place du site officiel -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={localeMeta[l].hreflang} href={new URL(homePath(l), site.url).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(homePath(defaultLocale), site.url).href} />
+    <meta name="theme-color" content="#101529" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={localeMeta[lang].og} />
+    <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontMono} as="font" type="font/woff2" crossorigin />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- États initiaux d'animation seulement si le JS tourne et sans « réduire les animations ».
+         Filet de sécurité : tout s'affiche après 4 s si le JS échoue. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('js-motion');
+        var seen = null, nav = null;
+        try {
+          seen = sessionStorage.getItem('aks-intro');
+          nav = sessionStorage.getItem('aks-nav');
+          sessionStorage.removeItem('aks-nav');
+        } catch (e) {}
+        if (nav) d.classList.add('js-curtain');
+        else if (!seen) d.classList.add('js-intro');
+        setTimeout(function () {
+          if (!d.classList.contains('motion-ready')) d.classList.remove('js-motion', 'js-intro', 'js-curtain');
+        }, 4000);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.a11y.skip}</a>
+    {intro && <Intro label={introLabel} />}
+    <div class="curtain" data-curtain aria-hidden="true"><span class="curtain__word">AKS</span></div>
+    <Nav lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <ConceptBadge lang={lang} />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

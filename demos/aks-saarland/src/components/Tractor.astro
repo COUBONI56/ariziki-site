@@ -1,0 +1,153 @@
+---
+/**
+ * Tracteur en dessin technique (SVG). Les roues tournent quand il avance,
+ * le gyrophare pulse, les annotations relient le dessin aux vraies prestations.
+ */
+interface Props { callouts: { tyre: string; engine: string; cab: string; hydraulic: string } }
+const { callouts } = Astro.props;
+
+const polar = (cx: number, cy: number, r: number, deg: number) => {
+  const a = (deg * Math.PI) / 180;
+  return [+(cx + r * Math.cos(a)).toFixed(1), +(cy + r * Math.sin(a)).toFixed(1)];
+};
+const lugs = (cx: number, cy: number, rOut: number, rIn: number, n: number, skew: number) =>
+  Array.from({ length: n }, (_, i) => {
+    const a = (360 / n) * i;
+    const [x1, y1] = polar(cx, cy, rOut, a);
+    const [x2, y2] = polar(cx, cy, rIn, a + skew);
+    return `M${x1} ${y1}L${x2} ${y2}`;
+  }).join('');
+const ring = (cx: number, cy: number, r: number, n: number, dot: number) =>
+  Array.from({ length: n }, (_, i) => polar(cx, cy, r, (360 / n) * i + 360 / n / 2)).map(([x, y]) => ({ x, y, r: dot }));
+
+const rear = { cx: 470, cy: 304 };
+const front = { cx: 150, cy: 334 };
+---
+
+<svg class="tractor" viewBox="0 0 800 440" role="img" aria-hidden="true" focusable="false" overflow="visible" data-tractor>
+  <defs>
+    <radialGradient id="tr-glow">
+      <stop offset="0" stop-color="#f3d27e" stop-opacity="0.9" />
+      <stop offset="0.18" stop-color="#dfa92d" stop-opacity="0.45" />
+      <stop offset="1" stop-color="#dfa92d" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="tr-pool">
+      <stop offset="0" stop-color="#dfa92d" stop-opacity="0.32" />
+      <stop offset="1" stop-color="#dfa92d" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="tr-beam" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#fff6e2" stop-opacity="0.22" />
+      <stop offset="1" stop-color="#fff6e2" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <g class="tr__move" data-tr-move>
+    <!-- Lumières -->
+    <polygon class="tr__beam" data-tr-light points="104,204 -560,96 -560,436 104,214" fill="url(#tr-beam)" />
+    <ellipse class="tr__pool" data-tr-light cx="470" cy="408" rx="300" ry="20" fill="url(#tr-pool)" />
+    <circle class="tr__glow" data-tr-light cx="530" cy="72" r="190" fill="url(#tr-glow)" />
+
+    <g class="tr__body">
+      <!-- Masse avant -->
+      <rect x="36" y="262" width="40" height="58" rx="3" />
+      <path class="tr__thin" d="M36 276H76M36 290H76M36 304H76" />
+      <!-- Châssis -->
+      <rect x="72" y="300" width="320" height="16" />
+      <!-- Capot -->
+      <path d="M76 280L82 208Q84 196 97 195L364 184L364 280Z" />
+      <path class="tr__thin" d="M86 214H98M86 222H98M86 230H98M86 238H98M86 246H98M86 254H98M86 262H98M86 270H98" />
+      <path class="tr__thin" d="M98 238L362 228M214 246L226 264M228 246L240 264M242 246L254 264M256 246L268 264" />
+      <rect class="tr__lamp" x="104" y="203" width="30" height="9" rx="2" />
+      <!-- Échappement -->
+      <rect x="322" y="94" width="9" height="92" rx="1" />
+      <path d="M318 95L336 89" />
+      <!-- Cabine -->
+      <path d="M376 280L384 116Q385 104 398 103L552 101Q564 101 565 113L572 280Z" />
+      <path class="tr__glass" d="M395 118L552 116L557 236L391 240Z" />
+      <path class="tr__thin" d="M474 117L476 238M488 252H506" />
+      <path class="tr__ref" d="M404 222L446 128M422 228L454 158" />
+      <rect x="370" y="84" width="208" height="19" rx="4" />
+      <path class="tr__rim" d="M376 84H572" />
+      <path d="M384 132L364 138" />
+      <rect x="354" y="134" width="10" height="24" rx="2" />
+      <!-- Gyrophare -->
+      <rect x="521" y="78" width="18" height="6" rx="1" />
+      <rect class="tr__beacon" x="523" y="65" width="14" height="13" rx="3" />
+
+      <!-- Attelage arrière (hydraulique) -->
+      <path class="tr__thick" d="M560 336L650 352M586 268L650 300M580 250L632 266M630 266L642 348" />
+      <rect x="-4" y="-27" width="8" height="54" rx="2" transform="translate(588 284) rotate(38)" />
+      <circle cx="650" cy="352" r="4" /><circle cx="650" cy="300" r="4" />
+
+      <!-- Roue arrière -->
+      <g class="tr__wheel">
+        <circle cx={rear.cx} cy={rear.cy} r="100" />
+        <g class="tr__spin" data-tr-spin style={`transform-origin:${rear.cx}px ${rear.cy}px`}>
+          <path class="tr__lug" d={lugs(rear.cx, rear.cy, 100, 86, 32, 7)} />
+          {ring(rear.cx, rear.cy, 44, 8, 6).map((p) => <circle class="tr__thin" cx={p.x} cy={p.y} r={p.r} />)}
+          {ring(rear.cx, rear.cy, 31, 8, 2.6).map((p) => <circle cx={p.x} cy={p.y} r={p.r} />)}
+        </g>
+        <circle class="tr__thin" cx={rear.cx} cy={rear.cy} r="86" />
+        <circle cx={rear.cx} cy={rear.cy} r="62" />
+        <circle class="tr__thin" cx={rear.cx} cy={rear.cy} r="56" />
+        <circle cx={rear.cx} cy={rear.cy} r="22" />
+        <circle cx={rear.cx} cy={rear.cy} r="8" />
+      </g>
+      <!-- Aile arrière -->
+      <path d="M356 304A114 114 0 0 1 584 304L574 304A104 104 0 0 0 366 304Z" />
+
+      <!-- Roue avant -->
+      <g class="tr__wheel">
+        <circle cx={front.cx} cy={front.cy} r="70" />
+        <g class="tr__spin" data-tr-spin data-ratio="1.43" style={`transform-origin:${front.cx}px ${front.cy}px`}>
+          <path class="tr__lug" d={lugs(front.cx, front.cy, 70, 60, 24, 8)} />
+          {ring(front.cx, front.cy, 30, 6, 4.5).map((p) => <circle class="tr__thin" cx={p.x} cy={p.y} r={p.r} />)}
+          {ring(front.cx, front.cy, 20, 6, 2).map((p) => <circle cx={p.x} cy={p.y} r={p.r} />)}
+        </g>
+        <circle class="tr__thin" cx={front.cx} cy={front.cy} r="60" />
+        <circle cx={front.cx} cy={front.cy} r="43" />
+        <circle class="tr__thin" cx={front.cx} cy={front.cy} r="38" />
+        <circle cx={front.cx} cy={front.cy} r="15" />
+        <circle cx={front.cx} cy={front.cy} r="5" />
+      </g>
+      <!-- Garde-boue avant -->
+      <path d="M82 295A78 78 0 0 1 210 284L205.9 287.1A73 73 0 0 0 86.8 297.5Z" />
+    </g>
+  </g>
+
+  <!-- Annotations (bureau uniquement) -->
+  <g class="tr__callouts" data-tr-callouts>
+    <g data-callout><circle class="tr__dot" cx="392" cy="352" r="3.5" /><path d="M392 352L372 430H360" /><text x="352" y="434" text-anchor="end">{callouts.tyre}</text></g>
+    <g data-callout><circle class="tr__dot" cx="236" cy="214" r="3.5" /><path d="M236 214V150" /><text x="228" y="155" text-anchor="end">{callouts.engine}</text></g>
+    <g data-callout><circle class="tr__dot" cx="430" cy="176" r="3.5" /><path d="M430 176V38" /><text x="438" y="43">{callouts.cab}</text></g>
+    <g data-callout><circle class="tr__dot" cx="604" cy="276" r="3.5" /><path d="M604 276L676 238H690" /><text x="698" y="242">{callouts.hydraulic}</text></g>
+  </g>
+</svg>
+
+<style>
+  .tractor { width: 100%; height: auto; overflow: visible; }
+  .tr__body * { fill: var(--c-night); stroke: rgb(255 255 255 / 0.82); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .tr__body .tr__thin { fill: none; stroke: rgb(255 255 255 / 0.36); stroke-width: 1; }
+  .tr__body .tr__lug { fill: none; stroke: rgb(255 255 255 / 0.62); stroke-width: 1.4; }
+  .tr__body .tr__thick { fill: none; stroke-width: 3; }
+  .tr__body .tr__glass { fill: rgb(255 255 255 / 0.035); stroke: rgb(255 255 255 / 0.5); stroke-width: 1; }
+  .tr__body .tr__ref { fill: none; stroke: rgb(255 255 255 / 0.16); }
+  .tr__body .tr__rim { fill: none; stroke: rgb(var(--c-accent-rgb) / 0.7); stroke-width: 1.4; }
+  .tr__body .tr__lamp { fill: #fff6e2; stroke: none; }
+  .tr__body .tr__beacon { fill: var(--c-accent); stroke: none; }
+  .tr__body g, .tr__body .tr__spin { fill: none; stroke: none; }
+  .tr__wheel > circle:first-child { fill: var(--c-night); }
+  .tr__spin { transform-box: view-box; }
+
+  .tr__glow { animation: beacon 1.6s steps(1, end) infinite; }
+  .tr__pool { animation: beacon 1.6s steps(1, end) infinite; }
+  @keyframes beacon {
+    0% { opacity: 1; } 12% { opacity: 0.35; } 20% { opacity: 1; } 32% { opacity: 0.3; } 100% { opacity: 0.3; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tr__glow, .tr__pool { animation: none; opacity: 0.8; } }
+
+  .tr__callouts path { fill: none; stroke: rgb(255 255 255 / 0.4); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .tr__callouts .tr__dot { fill: var(--c-accent); stroke: none; }
+  .tr__callouts text { fill: var(--c-stone); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+  @media (max-width: 960px) { .tr__callouts { display: none; } }
+</style>

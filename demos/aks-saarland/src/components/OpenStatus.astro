@@ -1,0 +1,67 @@
+---
+/**
+ * « Jetzt geöffnet · bis 18:00 Uhr » calculé en direct (heure de Berlin).
+ * Sans JavaScript : les horaires s'affichent simplement.
+ */
+import { site } from '../config/site';
+import { ui } from '../i18n/ui';
+import type { Locale } from '../i18n';
+
+interface Props { lang: Locale; variant?: 'bar' | 'card' }
+const { lang, variant = 'bar' } = Astro.props;
+const h = ui[lang].hours;
+const fallback = `${h.rows[0].label} 8–18 · ${h.rows[1].label} 9–13`;
+const config = JSON.stringify({
+  hours: site.hours, tz: site.timeZone,
+  t: { openNow: h.openNow, closedNow: h.closedNow, until: h.until, opens: h.opens, today: h.today, tomorrow: h.tomorrow, weekdays: h.weekdays },
+});
+---
+<span class:list={['status', `status--${variant}`]} data-open-status data-config={config}>
+  <span class="signal" data-state="closed" data-status-dot aria-hidden="true"></span>
+  <span class="status__text" data-status-text>{fallback}</span>
+</span>
+
+<style>
+  .status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+  .status--bar { color: var(--c-white); }
+  .status__text strong { font-weight: 700; }
+</style>
+
+<script>
+  type Cfg = {
+    hours: { days: number[]; open: string; close: string }[];
+    tz: string;
+    t: { openNow: string; closedNow: string; until: string; opens: string; today: string; tomorrow: string; weekdays: string[] };
+  };
+  const toMin = (s: string) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+  const fmt = (s: string, lang: string) => (lang.startsWith('de') ? s : s.replace(/^0/, ''));
+
+  function update(el: HTMLElement) {
+    const cfg: Cfg = JSON.parse(el.dataset.config!);
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: cfg.tz, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+    const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.find((p) => p.type === 'weekday')!.value);
+    const now = Number(parts.find((p) => p.type === 'hour')!.value) % 24 * 60 + Number(parts.find((p) => p.type === 'minute')!.value);
+    const slot = (d: number) => cfg.hours.find((h) => h.days.includes(d));
+    const lang = document.documentElement.lang;
+    const text = el.querySelector<HTMLElement>('[data-status-text]')!;
+    const dot = el.querySelector<HTMLElement>('[data-status-dot]')!;
+    const today = slot(wd);
+    if (today && now >= toMin(today.open) && now < toMin(today.close)) {
+      dot.dataset.state = 'open';
+      text.innerHTML = `<strong>${cfg.t.openNow}</strong> · ${cfg.t.until.replace('{t}', fmt(today.close, lang))}`;
+      return;
+    }
+    dot.dataset.state = 'closed';
+    for (let i = 0; i < 8; i++) {
+      const d = (wd + i) % 7;
+      const s = slot(d);
+      if (!s || (i === 0 && now >= toMin(s.open))) continue;
+      const day = i === 0 ? cfg.t.today : i === 1 ? cfg.t.tomorrow : cfg.t.weekdays[d];
+      text.innerHTML = `<strong>${cfg.t.closedNow}</strong> · ${cfg.t.opens.replace('{d}', day).replace('{t}', fmt(s.open, lang))}`;
+      return;
+    }
+  }
+  const run = () => document.querySelectorAll<HTMLElement>('[data-open-status]').forEach(update);
+  run();
+  setInterval(run, 60_000);
+</script>

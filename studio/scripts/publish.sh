@@ -2,6 +2,8 @@
 # Publie arizikismartness.com : construit dist/ puis l'ajoute à la branche « studio-production ».
 set -euo pipefail
 npm run build
+# Démos clients (ex. /aks.saarland/) : reconstruites et ajoutées à chaque publication
+bash ../demos/build-demos.sh "$PWD/dist"
 REMOTE=$(git remote get-url origin)
 TMP=$(mktemp -d)
 if git ls-remote --exit-code --heads "$REMOTE" studio-production >/dev/null 2>&1; then

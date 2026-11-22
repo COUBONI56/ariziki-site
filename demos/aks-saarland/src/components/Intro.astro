@@ -1,0 +1,29 @@
+---
+/** Entrée de site (1re visite de la session) : « AKS » sort du sol, le gyrophare s'allume. */
+interface Props { label: string }
+const { label } = Astro.props;
+---
+<div class="intro" aria-hidden="true" data-intro>
+  <div class="intro__inner">
+    <div class="intro__beacon"><span></span></div>
+    <div class="intro__word">
+      {['A', 'K', 'S'].map((l) => <span class="intro__mask"><span class="intro__letter">{l}</span></span>)}
+    </div>
+    <div class="intro__line"><span></span></div>
+    <p class="intro__label">{label}</p>
+  </div>
+</div>
+
+<style>
+  .intro { display: none; position: fixed; inset: 0; z-index: 100; background: var(--c-night); color: var(--c-white); place-items: center; }
+  :global(html.js-intro) .intro { display: grid; }
+  .intro__inner { display: grid; justify-items: center; gap: 18px; }
+  .intro__beacon { width: 26px; height: 14px; border-radius: 4px 4px 1px 1px; background: #262d4a; position: relative; }
+  .intro__beacon span { position: absolute; inset: 0; border-radius: inherit; background: var(--c-accent); opacity: 0; box-shadow: 0 0 40px 12px rgb(var(--c-accent-rgb) / 0.55); }
+  .intro__word { display: flex; font-weight: 880; font-stretch: 68%; font-size: clamp(4.5rem, 14vw, 9rem); line-height: 0.82; letter-spacing: 0.01em; }
+  .intro__mask { display: inline-block; overflow: clip; padding-bottom: 0.04em; }
+  .intro__letter { display: inline-block; transform: translateY(110%); }
+  .intro__line { width: min(220px, 50vw); height: 2px; background: rgb(255 255 255 / 0.12); overflow: hidden; }
+  .intro__line span { display: block; height: 100%; background: var(--c-accent); transform: scaleX(0); transform-origin: left; }
+  .intro__label { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-stone); opacity: 0; }
+</style>

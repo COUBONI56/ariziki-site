@@ -1,0 +1,374 @@
+---
+import { site, rentals } from '../config/site';
+import { home } from '../content/home';
+import { localeMeta, type Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const q = home[lang].request;
+const kinds = home[lang].rental.kinds;
+const topics = Object.entries(q.topics) as [keyof typeof q.topics, string][];
+const vehicles = Object.entries(q.vehicles) as [keyof typeof q.vehicles, string][];
+const urgencies = Object.entries(q.urgencies) as [keyof typeof q.urgencies, string][];
+const channels = Object.entries(q.channels) as [keyof typeof q.channels, string][];
+const strings = JSON.stringify({ result: q.result, stepOf: q.stepOf, pick: q.pick, required: q.required, locale: localeMeta[lang].intl });
+---
+<section class="request section theme-dark grid-bg" id="anfrage" data-nav-theme="dark" aria-labelledby="anfrage-title">
+  <div class="container request__grid">
+    <div class="request__intro">
+      <p class="eyebrow" data-reveal>{q.eyebrow}</p>
+      <h2 class="h request__title" id="anfrage-title" data-split>
+        {q.title.map((l) => <span class="mask"><span class="mask__inner">{l}</span></span>)}
+      </h2>
+      <p class="lead" data-reveal>{q.lead}</p>
+      <ol class="request__points" data-reveal>
+        {q.points.map((p, i) => <li><span class="mono">0{i + 1}</span>{p}</li>)}
+      </ol>
+      <div class="request__direct" data-reveal>
+        <p class="mono">{q.direct}</p>
+        <a href={site.phone.href}>{site.phone.display}</a>
+        <a href={site.whatsapp.href} target="_blank" rel="noopener">WhatsApp {site.whatsapp.display}</a>
+      </div>
+    </div>
+
+    <div class="wizard" data-wizard data-strings={strings}>
+      <ol class="wizard__steps" aria-hidden="true">
+        {q.steps.map((s, i) => <li data-step-tab={i + 1} class:list={[{ 'is-current': i === 0 }]}><span>{String(i + 1).padStart(2, '0')}</span>{s}</li>)}
+      </ol>
+      <p class="wizard__count mono" data-step-count aria-live="polite"></p>
+
+      <form class="wizard__form" data-request method="post" action="" novalidate>
+        <!-- 1 · Anliegen -->
+        <fieldset class="step is-active" data-step="1">
+          <legend class="step__q">{q.q1}</legend>
+          <div class="choices choices--2">
+            {topics.map(([k, label]) => (
+              <label class="choice">
+                <input type="radio" name="topic" value={k} required />
+                <span class="choice__box"><span class="choice__mark" aria-hidden="true"></span>{label}</span>
+              </label>
+            ))}
+          </div>
+          <p class="step__error" data-error role="alert"></p>
+        </fieldset>
+
+        <!-- 2 · Fahrzeug (ou machine du Mietpark si « mieten ») -->
+        <fieldset class="step" data-step="2">
+          <legend class="step__q">{q.q2}</legend>
+          <div class="choices choices--3" data-when="default">
+            {vehicles.map(([k, label]) => (
+              <label class="choice">
+                <input type="radio" name="vehicle" value={k} required />
+                <span class="choice__box"><span class="choice__mark" aria-hidden="true"></span>{label}</span>
+              </label>
+            ))}
+          </div>
+          <div class="choices choices--2" data-when="rent" hidden>
+            {rentals.map((m) => (
+              <label class="choice">
+                <input type="radio" name="machine" value={m.id} data-label={`${m.brand} ${m.model}`} required disabled />
+                <span class="choice__box"><span class="choice__mark" aria-hidden="true"></span><span>{m.brand} {m.model}<small>{kinds[m.kind]}</small></span></span>
+              </label>
+            ))}
+          </div>
+          <p class="step__error" data-error role="alert"></p>
+        </fieldset>
+
+        <!-- 3 · Details -->
+        <fieldset class="step" data-step="3">
+          <legend class="step__q">{q.q3}</legend>
+          <div class="fields">
+            <label class="field">
+              <span class="field__label">{q.model}</span>
+              <input type="text" name="model" autocomplete="off" placeholder={q.modelPh} />
+            </label>
+            <label class="field field--wide">
+              <span class="field__label">{q.message}</span>
+              <textarea name="message" rows="3" placeholder={q.messagePh}></textarea>
+            </label>
+          </div>
+          <p class="field__label step__sublegend" id="urgency-label">{q.urgency}</p>
+          <div class="choices choices--3 choices--compact" role="radiogroup" aria-labelledby="urgency-label">
+            {urgencies.map(([k, label]) => (
+              <label class="choice">
+                <input type="radio" name="urgency" value={k} required />
+                <span class="choice__box"><span class="choice__mark" aria-hidden="true"></span>{label}</span>
+              </label>
+            ))}
+          </div>
+          <p class="step__error" data-error role="alert"></p>
+        </fieldset>
+
+        <!-- 4 · Kontakt -->
+        <fieldset class="step" data-step="4">
+          <legend class="step__q">{q.q4}</legend>
+          <div class="fields">
+            <label class="field"><span class="field__label">{q.name} *</span><input type="text" name="name" autocomplete="name" required /></label>
+            <label class="field"><span class="field__label">{q.phone} *</span><input type="tel" name="phone" autocomplete="tel" required /></label>
+            <label class="field"><span class="field__label">{q.email}</span><input type="email" name="email" autocomplete="email" /></label>
+            <label class="field"><span class="field__label">{q.place}</span><input type="text" name="place" autocomplete="address-level2" /></label>
+          </div>
+          <p class="field__label step__sublegend" id="channel-label">{q.channel}</p>
+          <div class="choices choices--3 choices--compact" role="radiogroup" aria-labelledby="channel-label">
+            {channels.map(([k, label], i) => (
+              <label class="choice">
+                <input type="radio" name="channel" value={k} checked={i === 0} />
+                <span class="choice__box"><span class="choice__mark" aria-hidden="true"></span>{label}</span>
+              </label>
+            ))}
+          </div>
+          <label class="consent">
+            <input type="checkbox" name="consent" required />
+            <span>{q.consent}</span>
+          </label>
+          <p class="step__error" data-error role="alert"></p>
+        </fieldset>
+
+        <div class="wizard__nav">
+          <button type="button" class="btn btn--ghost" data-prev hidden>{q.back}</button>
+          <button type="button" class="btn" data-next>{q.next}
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="submit" class="btn" data-submit>{q.submit}</button>
+        </div>
+      </form>
+
+      <div class="ticket" data-ticket hidden tabindex="-1">
+        <div class="ticket__head">
+          <p class="mono ticket__demo"><span class="signal" aria-hidden="true"></span>{q.result.demo}</p>
+          <h3 class="ticket__title">{q.result.title}</h3>
+        </div>
+        <dl class="ticket__rows" data-ticket-rows></dl>
+        <p class="ticket__note">{q.result.tracking}</p>
+        <button type="button" class="btn btn--ghost" data-restart>{q.result.restart}</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .request__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(40px, 6vw, 104px); align-items: start; }
+  .request__intro { display: grid; gap: 24px; position: sticky; top: calc(var(--nav-h) + 32px); }
+  .request__title { font-size: clamp(2.25rem, 1.3rem + 3.2vw, 4.25rem); }
+  .request__points { display: grid; border-top: 1px solid var(--c-line-dark); }
+  .request__points li { display: flex; gap: 18px; padding-block: 14px; border-bottom: 1px solid var(--c-line-dark); }
+  .request__points .mono { color: var(--c-brand); padding-top: 3px; }
+  .request__direct { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+  .request__direct .mono { color: var(--c-stone); width: 100%; }
+  .request__direct a { font-weight: 600; background: linear-gradient(var(--c-brand), var(--c-brand)) no-repeat 0 100% / 100% 1px; padding-bottom: 2px; }
+
+  .wizard { background: var(--c-carbon); border: 1px solid var(--c-line-dark); border-radius: var(--r-container); padding: clamp(20px, 3vw, 44px); }
+  .wizard__steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+  .wizard__steps li { display: grid; gap: 10px; font-size: var(--fs-small); color: var(--c-stone); padding-top: 12px; border-top: 2px solid var(--c-line-dark-strong); transition: color 300ms, border-color 300ms; }
+  .wizard__steps li span { font-family: var(--font-mono); font-size: 0.6875rem; }
+  .wizard__steps li.is-current { color: var(--c-white); border-color: var(--c-brand); }
+  .wizard__steps li.is-done { color: var(--c-white); border-color: rgb(255 255 255 / 0.7); }
+  .wizard__count { color: var(--c-stone); min-height: 1.2em; margin-bottom: 20px; }
+  :global(html:not(.js)) .wizard__steps, :global(html:not(.js)) .wizard__count { display: none; }
+
+  .step { border: 0; padding: 0; min-width: 0; }
+  :global(html.js) .step:not(.is-active) { display: none; }
+  :global(html:not(.js)) .step + .step { margin-top: 40px; }
+  .step__q { font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem); font-weight: 780; font-stretch: 78%; text-transform: uppercase; line-height: 1; margin-bottom: 24px; padding: 0; }
+  .step__sublegend { margin: 24px 0 12px; }
+  .step__error { min-height: 1.4em; margin-top: 12px; color: var(--c-accent-soft); font-size: var(--fs-small); }
+
+  .choices { display: grid; gap: 10px; }
+  .choices--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choices--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .choice { position: relative; display: block; cursor: pointer; }
+  .choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .choice__box {
+    display: flex; align-items: center; gap: 12px; min-height: 64px; height: 100%; padding: 14px 16px;
+    border: 1px solid var(--c-line-dark-strong); border-radius: var(--r-card);
+    font-weight: 560; line-height: 1.25;
+    transition: border-color 200ms, background-color 200ms;
+  }
+  .choices--compact .choice__box { min-height: 52px; }
+  .choice__box small { display: block; margin-top: 3px; font-weight: 400; font-size: 0.8125rem; color: var(--c-stone); }
+  .choice__mark { flex: none; width: 16px; height: 16px; border: 1px solid rgb(255 255 255 / 0.5); border-radius: 2px; position: relative; transition: border-color 200ms; }
+  .choice__mark::after { content: ''; position: absolute; inset: 3px; background: var(--c-brand); transform: scale(0); transition: transform 200ms var(--ease-out); }
+  .choice:hover .choice__box { border-color: rgb(255 255 255 / 0.5); background: var(--c-iron); }
+  .choice input:checked + .choice__box { border-color: var(--c-brand); background: rgb(var(--c-brand-rgb) / 0.08); }
+  .choice input:checked + .choice__box .choice__mark { border-color: var(--c-brand); }
+  .choice input:checked + .choice__box .choice__mark::after { transform: scale(1); }
+  .choice input:focus-visible + .choice__box { outline: 2px solid var(--c-brand); outline-offset: 2px; }
+
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .field { display: grid; gap: 8px; }
+  .field--wide { grid-column: 1 / -1; }
+  .field__label { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-stone); }
+  .field input, .field textarea {
+    width: 100%; padding: 14px 14px; border-radius: var(--r-card); border: 1px solid var(--c-line-dark-strong);
+    background: var(--c-night); color: var(--c-white); font-size: 1rem; line-height: 1.4;
+    transition: border-color 200ms;
+  }
+  .field textarea { resize: vertical; min-height: 96px; }
+  .field input::placeholder, .field textarea::placeholder { color: #8790a0; }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--c-brand); }
+  .field input[aria-invalid='true'] { border-color: var(--c-accent-soft); }
+  .consent { display: flex; gap: 12px; align-items: flex-start; margin-top: 20px; font-size: var(--fs-small); color: var(--c-stone); cursor: pointer; }
+  .consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--c-brand); flex: none; }
+
+  .wizard__nav { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--c-line-dark); }
+  .wizard__nav [data-prev] { margin-right: auto; }
+  :global(html.js) .wizard__nav [data-submit] { display: none; }
+  :global(html.js) .wizard__nav.is-last [data-submit] { display: inline-flex; }
+  :global(html.js) .wizard__nav.is-last [data-next] { display: none; }
+  :global(html:not(.js)) .wizard__nav [data-next], :global(html:not(.js)) .wizard__nav [data-prev] { display: none; }
+
+  .ticket { display: grid; gap: 22px; outline: none; }
+  .ticket__demo { display: inline-flex; align-items: center; gap: 10px; color: var(--c-accent); }
+  .ticket__title { margin-top: 14px; font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem); font-weight: 780; font-stretch: 78%; text-transform: uppercase; line-height: 1; }
+  .ticket__rows { display: grid; border: 1px dashed var(--c-line-dark-strong); border-radius: var(--r-card); }
+  .ticket__rows :global(> div) { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 12px 16px; border-bottom: 1px dashed var(--c-line-dark); }
+  .ticket__rows :global(> div:last-child) { border-bottom: 0; }
+  .ticket__rows :global(dt) { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-stone); padding-top: 3px; }
+  .ticket__rows :global(dd) { word-break: break-word; }
+  .ticket__rows :global(.is-source dd) { color: var(--c-brand); font-weight: 600; }
+  .ticket__note { color: var(--c-stone); font-size: var(--fs-small); padding-left: 14px; border-left: 2px solid var(--c-brand); }
+  .ticket .btn { justify-self: start; }
+
+  @media (max-width: 1060px) {
+    .request__grid { grid-template-columns: 1fr; }
+    .request__intro { position: static; }
+  }
+  @media (max-width: 620px) {
+    .choices--2, .choices--3, .fields { grid-template-columns: 1fr; }
+    .choices--compact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .choices--compact .choice__box { padding: 12px 10px; gap: 8px; font-size: 0.875rem; }
+    .wizard__steps li { font-size: 0.75rem; }
+    .ticket__rows :global(> div) { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+
+<script>
+  type Strings = {
+    result: { id: string; labels: Record<string, string>; source: string };
+    stepOf: string; pick: string; required: string; locale: string;
+  };
+
+  const wizard = document.querySelector<HTMLElement>('[data-wizard]');
+  if (wizard) init(wizard);
+
+  function init(wizard: HTMLElement) {
+    const S: Strings = JSON.parse(wizard.dataset.strings!);
+    const form = wizard.querySelector<HTMLFormElement>('[data-request]')!;
+    const steps = Array.from(form.querySelectorAll<HTMLElement>('[data-step]'));
+    const tabs = Array.from(wizard.querySelectorAll<HTMLElement>('[data-step-tab]'));
+    const count = wizard.querySelector<HTMLElement>('[data-step-count]')!;
+    const nav = form.querySelector<HTMLElement>('.wizard__nav')!;
+    const prev = form.querySelector<HTMLButtonElement>('[data-prev]')!;
+    const next = form.querySelector<HTMLButtonElement>('[data-next]')!;
+    const ticket = wizard.querySelector<HTMLElement>('[data-ticket]')!;
+    const rows = wizard.querySelector<HTMLElement>('[data-ticket-rows]')!;
+    let current = 0;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function show(i: number, focus = true) {
+      current = i;
+      steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
+      tabs.forEach((t, k) => { t.classList.toggle('is-current', k === i); t.classList.toggle('is-done', k < i); });
+      prev.hidden = i === 0;
+      nav.classList.toggle('is-last', i === steps.length - 1);
+      count.textContent = S.stepOf.replace('{n}', String(i + 1)).replace('{t}', String(steps.length));
+      const step = steps[i];
+      if (!reduce) step.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+      if (focus) step.querySelector<HTMLElement>('input:not([disabled]), textarea')?.focus({ preventScroll: true });
+    }
+
+    function syncRent() {
+      const rent = (form.elements.namedItem('topic') as RadioNodeList).value === 'rent';
+      form.querySelectorAll<HTMLElement>('[data-when]').forEach((g) => {
+        const on = g.dataset.when === (rent ? 'rent' : 'default');
+        g.hidden = !on;
+        g.querySelectorAll('input').forEach((inp) => (inp.disabled = !on));
+      });
+    }
+    form.addEventListener('change', (e) => { if ((e.target as HTMLInputElement).name === 'topic') syncRent(); });
+
+    function validate(step: HTMLElement) {
+      const err = step.querySelector<HTMLElement>('[data-error]')!;
+      err.textContent = '';
+      const inputs = Array.from(step.querySelectorAll<HTMLInputElement>('input:not([disabled]), textarea'));
+      const radios = new Set(inputs.filter((i) => i.type === 'radio' && i.required).map((i) => i.name));
+      for (const name of radios) {
+        if (!inputs.some((i) => i.name === name && i.checked)) { err.textContent = S.pick; return false; }
+      }
+      for (const inp of inputs.filter((i) => i.type !== 'radio')) {
+        const bad = inp.type === 'checkbox' ? inp.required && !inp.checked : !inp.checkValidity() || (inp.required && !inp.value.trim());
+        inp.setAttribute('aria-invalid', bad ? 'true' : 'false');
+        if (bad) { err.textContent = S.required; inp.focus(); return false; }
+      }
+      return true;
+    }
+
+    next.addEventListener('click', () => { if (validate(steps[current])) show(current + 1); });
+    prev.addEventListener('click', () => show(current - 1));
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!validate(steps[current])) return;
+      const fd = new FormData(form);
+      const label = (name: string) => {
+        const el = form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`);
+        if (!el) return '';
+        return el.dataset.label ?? el.closest('label')!.querySelector('.choice__box')!.textContent!.trim();
+      };
+      const d = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const id = `WEB-${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${String(Math.floor(Math.random() * 900) + 100)}`;
+      const when = new Intl.DateTimeFormat(S.locale, { dateStyle: 'medium', timeStyle: 'short' }).format(d);
+      const contact = [fd.get('name'), fd.get('phone'), fd.get('email'), fd.get('place')].filter(Boolean).join(' · ');
+      const L = S.result.labels;
+      const data: [string, string, string?][] = [
+        [S.result.id, `${id} · ${when}`],
+        [L.topic, label('topic')],
+        [L.vehicle, label('vehicle') || label('machine')],
+        [L.model, String(fd.get('model') ?? '')],
+        [L.urgency, label('urgency')],
+        [L.message, String(fd.get('message') ?? '')],
+        [L.contact, contact],
+        [L.channel, label('channel')],
+        [L.source, S.result.source, 'is-source'],
+      ];
+      rows.replaceChildren(...data.filter(([, v]) => v).map(([k, v, cls]) => {
+        const row = document.createElement('div');
+        if (cls) row.className = cls;
+        const dt = document.createElement('dt'); dt.textContent = k;
+        const dd = document.createElement('dd'); dd.textContent = v;
+        row.append(dt, dd);
+        return row;
+      }));
+      form.hidden = true;
+      wizard.querySelector<HTMLElement>('.wizard__steps')!.hidden = true;
+      count.textContent = '';
+      ticket.hidden = false;
+      ticket.focus({ preventScroll: true });
+      if (!reduce) ticket.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 600, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+    });
+
+    wizard.querySelector('[data-restart]')!.addEventListener('click', () => {
+      form.reset(); syncRent();
+      form.hidden = false; ticket.hidden = true;
+      wizard.querySelector<HTMLElement>('.wizard__steps')!.hidden = false;
+      show(0);
+    });
+
+    // Pré-remplissage depuis les boutons « Maschine anfragen » / « Verfügbarkeit anfragen »
+    document.querySelectorAll<HTMLElement>('[data-prefill]').forEach((a) => {
+      a.addEventListener('click', () => {
+        form.reset(); form.hidden = false; ticket.hidden = true;
+        wizard.querySelector<HTMLElement>('.wizard__steps')!.hidden = false;
+        const topic = form.querySelector<HTMLInputElement>(`input[name="topic"][value="${a.dataset.prefill}"]`);
+        if (topic) topic.checked = true;
+        syncRent();
+        const machine = a.dataset.machine && form.querySelector<HTMLInputElement>(`input[name="machine"][value="${a.dataset.machine}"]`);
+        if (machine) { machine.checked = true; show(2, false); } else show(1, false);
+      });
+    });
+
+    show(0, false);
+  }
+</script>

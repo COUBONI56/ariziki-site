@@ -1,0 +1,121 @@
+---
+import Tractor from './Tractor.astro';
+import OpenStatus from './OpenStatus.astro';
+import { site } from '../config/site';
+import { home } from '../content/home';
+import { homePath, type Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const h = home[lang].hero;
+
+// Sillons du champ en perspective (repère 0–100, horizon en haut de la boîte)
+const VP = 58;
+const furrows = Array.from({ length: 51 }, (_, i) => `M${VP} 0L${-200 + i * 10} 100`).join('');
+const rows = Array.from({ length: 13 }, (_, k) => {
+  const y = +(100 * Math.pow((k + 1) / 13, 1.9)).toFixed(2);
+  return `M-200 ${y}H300`;
+}).join('');
+---
+
+<section class="hero theme-dark" data-hero data-nav-theme="dark" aria-labelledby="hero-title">
+  <div class="hero__sky" aria-hidden="true"></div>
+  <div class="hero__field" aria-hidden="true" data-field>
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path class="hero__furrows" data-furrows pathLength="1" d={furrows} />
+      <path class="hero__rows" data-rows d={rows} />
+      <path class="hero__horizon" d="M-200 0H300" />
+    </svg>
+  </div>
+
+  <div class="hero__inner container" data-hero-content>
+    <p class="eyebrow" data-hero-item>{h.eyebrow}</p>
+    <h1 class="hero__title display" id="hero-title" data-hero-title>
+      {h.title.map((line) => <span class="mask"><span class="mask__inner">{line}</span></span>)}
+    </h1>
+    <div class="hero__bottom">
+      <p class="hero__lead lead" data-hero-item>{h.lead}</p>
+      <div class="hero__actions" data-hero-item>
+        <a class="btn" href={`${homePath(lang)}#anfrage`} data-magnetic>
+          <span class="btn__label">{h.primary}</span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn--ghost" href={site.whatsapp.href} target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>
+          <span class="btn__label">{h.secondary}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__machine" data-hero-machine>
+    <Tractor callouts={h.callouts} />
+  </div>
+
+  <div class="hero__bar container" data-hero-item>
+    <OpenStatus lang={lang} />
+    <span class="hero__bar-item mono">{site.address.street} · {site.address.zip} {site.address.city}</span>
+    <a class="hero__bar-item mono" href={site.phone.href}>{site.phone.display}</a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative; min-height: 100vh; min-height: 100svh; overflow: clip; isolation: isolate;
+    display: flex; flex-direction: column; padding-top: calc(var(--nav-h) + clamp(28px, 6vh, 72px));
+  }
+  .hero__sky {
+    position: absolute; inset: 0; z-index: -3;
+    background:
+      radial-gradient(60% 50% at 74% 62%, rgb(var(--c-accent-rgb) / 0.10), transparent 70%),
+      radial-gradient(120% 70% at 50% 100%, #1b2343 0%, transparent 60%),
+      linear-gradient(180deg, #0a0e1c 0%, #101529 55%, #131a33 100%);
+  }
+  .hero__field { position: absolute; left: 0; right: 0; top: 64%; bottom: 0; z-index: -2; }
+  .hero__field svg { width: 100%; height: 100%; overflow: visible; }
+  .hero__field path { fill: none; vector-effect: non-scaling-stroke; }
+  .hero__furrows { stroke: rgb(255 255 255 / 0.13); stroke-width: 1; }
+  .hero__rows { stroke: rgb(255 255 255 / 0.06); stroke-width: 1; }
+  .hero__horizon { stroke: rgb(var(--c-accent-rgb) / 0.35); stroke-width: 1; }
+  .hero__field::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, #101529 0%, rgb(16 21 41 / 0.55) 22%, transparent 55%, rgb(16 21 41 / 0.6) 100%);
+  }
+
+  .hero__inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; }
+  .hero__title { margin-top: clamp(18px, 3vh, 32px); }
+  .hero__bottom { margin-top: auto; padding-top: 32px; display: grid; gap: 24px; max-width: 560px; padding-bottom: 28px; }
+  .hero__lead { color: #c8cedb; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .hero__machine {
+    /* calé sur la hauteur de l'écran (et non du hero) : pas de saut si le titre change de hauteur pendant le chargement des polices */
+    --machine-w: clamp(560px, 50vw, 900px);
+    position: absolute; z-index: 1; right: clamp(-40px, 1vw, 40px);
+    top: calc(100vh - clamp(56px, 9vh, 96px) - var(--machine-w) * 0.55);
+    top: calc(100svh - clamp(56px, 9vh, 96px) - var(--machine-w) * 0.55);
+    width: var(--machine-w); pointer-events: none;
+  }
+  .hero__bar {
+    position: relative; z-index: 2; display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+    padding-block: 18px 22px; border-top: 1px solid var(--c-line-dark);
+  }
+  .hero__bar-item { color: var(--c-stone); }
+  a.hero__bar-item:hover { color: var(--c-white); }
+  .hero__scroll { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; color: var(--c-stone); }
+  .hero__scroll i { width: 1px; height: 22px; background: rgb(255 255 255 / 0.25); position: relative; overflow: hidden; }
+  .hero__scroll i::after { content: ''; position: absolute; inset: 0; background: var(--c-accent); transform: translateY(-100%); animation: drip 2.2s var(--ease-in-out) infinite; }
+  @keyframes drip { 0% { transform: translateY(-100%); } 60%, 100% { transform: translateY(100%); } }
+
+  @media (max-width: 1280px) {
+    .hero__machine { --machine-w: clamp(520px, 54vw, 700px); }
+  }
+  @media (max-width: 960px) {
+    .hero { padding-top: calc(var(--nav-h) + 28px); }
+    .hero__field { top: 72%; }
+    .hero__bottom { margin-top: 28px; padding-bottom: 0; }
+    .hero__machine { position: relative; right: auto; top: auto; width: 128%; max-width: 760px; margin: 8px -14% 0 auto; align-self: flex-end; }
+    .hero__bar { gap: 8px 20px; }
+    .hero__bar > :nth-child(2), .hero__scroll { display: none; }
+  }
+</style>

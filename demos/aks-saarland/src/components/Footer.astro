@@ -1,0 +1,64 @@
+---
+import { site } from '../config/site';
+import { ui } from '../i18n/ui';
+import { homePath, type Locale } from '../i18n';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const t = ui[lang];
+const home = homePath(lang);
+---
+<footer class="footer theme-dark" data-nav-theme="dark">
+  <div class="container">
+    <div class="footer__cols">
+      <div>
+        <p class="mono footer__label">{t.contact.address}</p>
+        <p>{site.name}<br />{site.address.street}<br />{site.address.zip} {site.address.city}</p>
+      </div>
+      <div>
+        <p class="mono footer__label">{t.contact.reach}</p>
+        <p><a href={site.phone.href}>{t.contact.office} {site.phone.display}</a><br /><a href={site.whatsapp.href} target="_blank" rel="noopener">WhatsApp {site.whatsapp.display}</a><br /><a href={`mailto:${site.email}`}>{site.email}</a></p>
+      </div>
+      <div>
+        <p class="mono footer__label">{t.hours.title}</p>
+        <p>{t.hours.rows[0].label} · 8–18<br />{t.hours.rows[1].label} · 9–13<br />{t.hours.appointment}</p>
+      </div>
+      <nav aria-label={t.footer.nav}>
+        <p class="mono footer__label">{t.footer.nav}</p>
+        <ul>{t.nav.map((n) => <li><a href={`${home}#${n.id}`}>{n.label}</a></li>)}</ul>
+      </nav>
+    </div>
+
+    <div class="footer__word" aria-hidden="true" data-footer-word>
+      {['A', 'K', 'S'].map((l) => <span class="footer__mask"><span class="footer__letter">{l}</span></span>)}
+      <i class="footer__beacon"></i>
+    </div>
+    <p class="footer__name mono">Fehr &amp; Martini GmbH · {site.tagline} · {site.address.city}</p>
+
+    <div class="footer__bottom">
+      <p>© {new Date().getFullYear()} {t.footer.rights}</p>
+      <p class="footer__concept">{t.conceptLong}</p>
+      <p>{t.footer.design} · <a href={site.studio.url}>{site.studio.name}</a></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding-top: clamp(72px, 8vw, 128px); padding-bottom: 72px; border-top: 1px solid var(--c-line-dark); }
+  .footer__cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; font-size: var(--fs-small); color: #c8cedb; line-height: 1.8; }
+  .footer__label { color: var(--c-stone); margin-bottom: 12px; }
+  .footer a:hover { color: var(--c-white); text-decoration: underline; text-underline-offset: 3px; }
+  .footer__word {
+    position: relative; display: flex; justify-content: center; margin-top: clamp(56px, 8vw, 120px);
+    font-size: clamp(9rem, 4rem + 26vw, 30rem); font-weight: 900; font-stretch: 66%; line-height: 0.74; letter-spacing: 0.005em;
+    color: var(--c-white);
+  }
+  .footer__mask { display: inline-block; overflow: clip; padding-top: 0.04em; }
+  .footer__letter { display: inline-block; }
+  .footer__beacon { position: absolute; top: 0.035em; right: calc(50% - 0.7em); width: 0.08em; height: 0.05em; border-radius: 0.012em 0.012em 0 0; background: var(--c-accent); box-shadow: 0 0 0.12em rgb(var(--c-accent-rgb) / 0.8); }
+  .footer__name { margin-top: 22px; text-align: center; color: var(--c-stone); letter-spacing: 0.18em; }
+  .footer__bottom { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--c-line-dark); display: flex; justify-content: space-between; gap: 12px 32px; flex-wrap: wrap; font-size: 0.8125rem; color: var(--c-stone); }
+  .footer__concept { color: var(--c-accent); }
+  @media (max-width: 860px) { .footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .footer__cols { grid-template-columns: 1fr; } .footer { padding-bottom: 84px; } }
+</style>

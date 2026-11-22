@@ -1,0 +1,22 @@
+---
+/** Emblème officiel d'AKS (repris de aks-saarland.de) + mention en clair. */
+import { Image } from 'astro:assets';
+import emblem from '../assets/aks-logo.png';
+interface Props { tagline: string }
+const { tagline } = Astro.props;
+---
+<span class="logo">
+  <Image class="logo__emblem" src={emblem} alt="" width={58} height={66} densities={[1, 2, 3]} loading="eager" />
+  <span class="logo__sub" aria-hidden="true"><strong>AKS Fehr &amp; Martini GmbH</strong><br />{tagline}</span>
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 14px; line-height: 1; }
+  .logo__emblem { width: 58px; height: auto; border-radius: 3px; }
+  .logo__sub {
+    font-family: var(--font-mono); font-size: 0.625rem; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; line-height: 1.45; opacity: 0.85;
+  }
+  .logo__sub strong { font-weight: 700; opacity: 1; }
+  @media (max-width: 420px) { .logo__sub { display: none; } }
+</style>
