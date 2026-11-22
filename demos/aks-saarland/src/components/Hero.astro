@@ -109,6 +109,8 @@ const rows = Array.from({ length: 13 }, (_, k) => {
 
   @media (max-width: 1280px) {
     .hero__machine { --machine-w: clamp(520px, 54vw, 700px); }
+    .hero__bottom { max-width: min(560px, 42vw); }
+    .hero__lead { font-size: var(--fs-body); }
   }
   @media (max-width: 960px) {
     .hero { padding-top: calc(var(--nav-h) + 28px); }
