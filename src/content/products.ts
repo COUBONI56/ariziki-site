@@ -6,12 +6,14 @@
  *  écosystème) et les données structurées se mettent à jour seuls.
  *
  *  status : 'live' (en ligne) | 'building' (en construction) | 'soon' (à venir)
- *  visual : 'offers' | 'pipeline' | 'dashboard' | 'orbit'  → illustrations en CSS,
+ *  visual : 'offers' | 'pipeline' | 'dashboard' | 'orbit' | 'studio'  → illustrations en CSS,
  *           aucune image à charger (remplaçables par de vraies captures).
  */
 import type { Locale } from '../i18n';
 
 type ProductText = { title?: string; status: string; tagline: string; description: string; tags: string[] };
+/** Logo en cartouche (mot-symbole en haut, nom du produit en dessous), comme ARIZIKI EliteOffers. */
+type ProductMark = { word: string; sub: string };
 
 export type Product = {
   slug: string;
@@ -19,7 +21,10 @@ export type Product = {
   name: string;
   status: 'live' | 'building' | 'soon';
   url?: string;
-  visual: 'offers' | 'pipeline' | 'dashboard' | 'orbit';
+  visual: 'offers' | 'pipeline' | 'dashboard' | 'orbit' | 'studio';
+  /** true = activité présentée par son propre site (pas de page produit sur ariziki.com) */
+  external?: boolean;
+  mark?: ProductMark;
   text: Record<Locale, ProductText>;
 };
 
@@ -81,8 +86,38 @@ export const products: Product[] = [
     },
   },
   {
-    slug: 'novarys',
+    slug: 'smartness',
     index: '03',
+    name: 'ARIZIKI Smartness',
+    status: 'live',
+    url: 'https://arizikismartness.com',
+    visual: 'studio',
+    external: true,
+    mark: { word: 'ARIZIKI', sub: 'Smartness' },
+    text: {
+      fr: {
+        status: 'En ligne',
+        tagline: 'Le studio de sites web premium.',
+        description: "La méthode qui a servi à créer ariziki.com, mise au service de votre entreprise : direction artistique sur mesure, animations soignées et sites ultra-rapides, en plusieurs langues.",
+        tags: ['Sites premium', 'Dès 1 490 €', 'Multilingue'],
+      },
+      en: {
+        status: 'Live',
+        tagline: 'The premium website studio.',
+        description: 'The method behind ariziki.com, put to work for your business: bespoke art direction, refined animations and ultra-fast multilingual websites.',
+        tags: ['Premium websites', 'From €1,490', 'Multilingual'],
+      },
+      de: {
+        status: 'Online',
+        tagline: 'Das Studio für Premium-Websites.',
+        description: 'Die Methode hinter ariziki.com – jetzt für Ihr Unternehmen: maßgeschneidertes Design, durchdachte Animationen und ultraschnelle, mehrsprachige Websites.',
+        tags: ['Premium-Websites', 'Ab 1.490 €', 'Mehrsprachig'],
+      },
+    },
+  },
+  {
+    slug: 'novarys',
+    index: '04',
     name: 'NOVARYS',
     status: 'building',
     visual: 'dashboard',
@@ -109,7 +144,7 @@ export const products: Product[] = [
   },
   {
     slug: 'next',
-    index: '04',
+    index: '05',
     name: 'ARIZIKI', // nom affiché : voir « title » dans chaque langue
     status: 'soon',
     visual: 'orbit',
@@ -141,3 +176,6 @@ export const products: Product[] = [
 
 /** Nom affiché d'un produit dans une langue donnée */
 export const productName = (p: Product, lang: Locale) => p.text[lang].title ?? p.name;
+
+/** Produits qui ont une page sur ariziki.com */
+export const hasPage = (p: Product) => p.status !== 'soon' && !p.external;

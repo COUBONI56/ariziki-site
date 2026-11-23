@@ -42,7 +42,7 @@ const chips = products.filter((p) => p.status !== 'soon');
     <ul class="hero__products">
       {chips.map((p) => (
         <li>
-          <a class:list={['hero__product', `is-${p.status}`]} href={route(lang, 'product', p.slug)}>
+          <a class:list={['hero__product', `is-${p.status}`]} href={p.external ? p.url : route(lang, 'product', p.slug)} {...(p.external ? { target: '_blank', rel: 'noopener' } : {})}>
             <i aria-hidden="true"></i>{productName(p, lang)}{p.status !== 'live' && <span class="hero__product-status"> · {p.text[lang].status}</span>}
           </a>
         </li>

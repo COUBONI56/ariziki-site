@@ -1,0 +1,29 @@
+---
+/**
+ * Logo en cartouche, sur le modèle d'ARIZIKI EliteOffers :
+ * mot-symbole ARIZIKI en haut, nom de l'activité en dessous, cadre doré.
+ * La taille suit la police du parent (font-size).
+ */
+interface Props { word: string; sub: string }
+const { word, sub } = Astro.props;
+---
+<span class="pmark" aria-hidden="true">
+  <span class="pmark__word">{word}</span>
+  <span class="pmark__sub">{sub}</span>
+</span>
+
+<style>
+  .pmark {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 0.3em;
+    padding: 0.5em 0.85em 0.42em;
+    border: 1.5px solid rgb(var(--color-accent-rgb) / 0.85); border-radius: 0.32em;
+    line-height: 1;
+  }
+  .pmark__word, .pmark__sub {
+    font-family: var(--font-brand); font-weight: 700;
+    background: linear-gradient(180deg, var(--color-accent-light) 0%, var(--color-accent) 55%, #b8922a 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .pmark__word { letter-spacing: 0.18em; margin-right: -0.18em; }
+  .pmark__sub { font-size: 0.5em; letter-spacing: 0.36em; margin-right: -0.36em; text-transform: uppercase; }
+</style>

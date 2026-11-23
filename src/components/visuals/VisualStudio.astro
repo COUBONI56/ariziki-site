@@ -1,0 +1,45 @@
+---
+/** ARIZIKI Smartness : fenêtre de navigateur avec le logo du studio et ses trois formules (prix réels). */
+import ProductMark from '../ProductMark.astro';
+import type { Locale } from '../../i18n';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const from = { fr: 'dès', en: 'from', de: 'ab' }[lang];
+const offers = [
+  ['Essentiel', { fr: '1 490 €', en: '€1,490', de: '1.490 €' }[lang]],
+  ['Signature', { fr: '3 900 €', en: '€3,900', de: '3.900 €' }[lang]],
+  ['Prestige', { fr: '8 900 €', en: '€8,900', de: '8.900 €' }[lang]],
+];
+---
+<div class="vst" aria-hidden="true">
+  <div class="vst__window" data-fan="1">
+    <div class="vst__chrome"><i></i><i></i><i></i><span class="vst__url">arizikismartness.com</span></div>
+    <div class="vst__page">
+      <div class="vst__mark"><ProductMark word="ARIZIKI" sub="Smartness" /></div>
+      <div class="vst__offers">
+        {offers.map(([name, price], i) => (
+          <div class:list={['vst__offer', { 'is-featured': i === 1 }]}>
+            <span class="vst__name">{name}</span>
+            <span class="vst__price"><small>{from}</small> {price}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vst { width: 100%; height: 100%; display: grid; place-items: center; }
+  .vst__window { width: min(460px, 94%); border-radius: var(--r-card); overflow: hidden; background: #090b12; border: 1px solid var(--color-steel-border); box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8); }
+  .vst__chrome { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #111216; border-bottom: 1px solid var(--color-steel-border); }
+  .vst__chrome i { width: 8px; height: 8px; border-radius: 50%; background: #2a2b30; }
+  .vst__url { margin-left: 10px; padding: 3px 10px; border-radius: 99px; background: #1b1c21; font-size: 10.5px; color: var(--color-stone); }
+  .vst__page { padding: 34px 18px 22px; display: grid; justify-items: center; gap: 26px; background: radial-gradient(70% 60% at 50% 0%, rgb(var(--color-accent-rgb) / 0.12), transparent 70%); }
+  .vst__mark { font-size: 1.5rem; }
+  .vst__offers { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .vst__offer { display: grid; gap: 6px; padding: 12px 10px; border-radius: 10px; background: #141416; border: 1px solid var(--color-steel-border); text-align: center; }
+  .vst__offer.is-featured { border-color: rgb(var(--color-accent-rgb) / 0.7); }
+  .vst__name { font-size: 11px; color: var(--color-paper); font-weight: 500; }
+  .vst__price { font-size: 13px; color: var(--color-accent-light); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vst__price small { font-size: 9px; color: var(--color-stone); }
+</style>

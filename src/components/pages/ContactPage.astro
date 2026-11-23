@@ -30,7 +30,7 @@ const c = contact[lang];
           <ul class="contact__products">
             {products.filter((p) => p.status !== 'soon').map((p) => (
               <li>
-                <a href={route(lang, 'product', p.slug)}>
+                <a href={p.external ? p.url : route(lang, 'product', p.slug)} {...(p.external ? { target: '_blank', rel: 'noopener' } : {})}>
                   <span>{productName(p, lang)}</span>
                   <span class="contact__status">{p.text[lang].status}</span>
                 </a>

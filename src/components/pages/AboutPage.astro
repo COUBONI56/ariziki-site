@@ -64,7 +64,7 @@ const a = about[lang];
       <SectionHead eyebrow={a.ecosystem.eyebrow} title={a.ecosystem.title} id="today-title" />
       <ul class="today__list">
         {products.map((p) => {
-          const href = p.status === 'soon' ? `${route(lang, 'contact')}?subject=next` : route(lang, 'product', p.slug);
+          const href = p.status === 'soon' ? `${route(lang, 'contact')}?subject=next` : p.external ? p.url : route(lang, 'product', p.slug);
           return (
             <li data-reveal>
               <a class="today__row" href={href}>

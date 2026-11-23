@@ -6,11 +6,13 @@ import VisualPipeline from './visuals/VisualPipeline.astro';
 import VisualOffers from './visuals/VisualOffers.astro';
 import VisualDashboard from './visuals/VisualDashboard.astro';
 import VisualOrbit from './visuals/VisualOrbit.astro';
+import VisualStudio from './visuals/VisualStudio.astro';
+import ProductMark from './ProductMark.astro';
 import type { Locale } from '../i18n';
 interface Props { lang: Locale }
 const { lang } = Astro.props;
 const e = home[lang].ecosystem;
-const visuals = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: VisualDashboard, orbit: VisualOrbit };
+const visuals = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: VisualDashboard, orbit: VisualOrbit, studio: VisualStudio };
 ---
 
 <section class="eco section theme-dark" id="ecosysteme" data-nav-theme="dark" aria-labelledby="eco-title">
@@ -30,7 +32,7 @@ const visuals = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: Vis
         const name = productName(p, lang);
         const live = p.status === 'live' && p.url;
         const href = live ? p.url : `${route(lang, 'contact')}?subject=${p.slug}`;
-        const pageHref = p.status !== 'soon' ? route(lang, 'product', p.slug) : undefined;
+        const pageHref = p.status !== 'soon' && !p.external ? route(lang, 'product', p.slug) : undefined;
         return (
           <article class:list={['pcard', `is-${p.status}`]} data-pcard aria-labelledby={`p-${p.slug}`}>
             <div class="pcard__inner">
@@ -39,7 +41,9 @@ const visuals = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: Vis
                   <span class="pcard__index">{p.index}</span>
                   <span class="pcard__status"><i></i>{t.status}</span>
                 </div>
-                <h3 class="pcard__name h-sm" id={`p-${p.slug}`}>{name}</h3>
+                {p.mark
+                  ? <h3 class="pcard__name pcard__name--mark" id={`p-${p.slug}`}><span class="sr-only">{name}</span><ProductMark word={p.mark.word} sub={p.mark.sub} /></h3>
+                  : <h3 class="pcard__name h-sm" id={`p-${p.slug}`}>{name}</h3>}
                 <p class="pcard__tagline">{t.tagline}</p>
                 <p class="pcard__desc">{t.description}</p>
                 <ul class="pcard__tags">
@@ -94,6 +98,7 @@ const visuals = { offers: VisualOffers, pipeline: VisualPipeline, dashboard: Vis
   .is-soon .pcard__status i { background: transparent; border: 1px solid var(--color-stone); box-shadow: none; }
   @keyframes blink { 50% { opacity: 0.25; } }
   .pcard__name { color: var(--color-paper); }
+  .pcard__name--mark { font-size: clamp(1.25rem, 1rem + 0.9vw, 1.75rem); line-height: 1; margin-block: 2px 4px; }
   .pcard__tagline { margin-top: 14px; font-size: var(--fs-body-lg); font-weight: 500; color: var(--color-paper); letter-spacing: -0.005em; max-width: 34ch; }
   .pcard__desc { margin-top: 12px; color: var(--color-stone); max-width: 44ch; }
   .pcard__tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 32px; }
